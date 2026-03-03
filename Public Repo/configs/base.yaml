@@ -1,28 +1,56 @@
-seed: 42
+# PBMRS Base Configuration
+# Matches SimConfig in sim.py (corrected version).
+# A simulation run is fully determined by (config + seed + code version).
+
+# ── Reproducibility ───────────────────────────────────────────────────────────
+seed:      42
 timesteps: 2000
-dt: 1.0
+dt:        1.0
 
+# ── Agent layer (Eq. 1, 6) ───────────────────────────────────────────────────
 n_agents: 2000
+
+# Per-agent order size scale. Default sized so that Qt = mt ∈ [-1, 1]
+# at n_agents=2000 (q0 * n_agents = 1.0).
+# If you change n_agents, rescale q0 = 1.0 / n_agents to preserve this.
+q0: 0.0005
+
+# Agent responsiveness (inverse temperature).
+# Ising subcritical condition requires J * beta < 1.
+# Default J=0.5, beta=1.2 → J*beta = 0.60 (subcritical, moderate herding).
+# Raise J toward 1/beta ≈ 0.83 for near-critical regime-shift dynamics.
 beta: 1.2
+J:    0.5
 
-# flow + returns
-kappa: 1.0
-alpha: 0.05
-sigma_eps: 1.0
+# ── Market field weights (Eq. 5) ─────────────────────────────────────────────
+# ht = alpha_r*rt - alpha_v*vt - alpha_l*(l0/lt - 1) + alpha_0
+alpha_r: 1.0    # trend-following weight
+alpha_v: 0.001  # volatility-aversion weight (keep small: v is O(theta_v) = O(1))
+alpha_l: 0.1    # liquidity-stress weight
+alpha_0: 0.0    # baseline behavioral bias (0 = no directional bias)
 
-# volatility + liquidity dynamics
-lambda_v: 0.05
-lambda_l: 0.03
+# ── Return dynamics (Eq. 2) ───────────────────────────────────────────────────
+mu0:       0.0   # baseline drift
+lam:       0.05  # price impact strength λ (liquidity-adjusted)
+sigma_eps: 0.01  # noise scale (~1% per step ≈ 16% annualised at dt=1)
 
-# optional noise terms in v and l updates
-eta_v: 0.0
-eta_l: 0.0
+# ── Volatility dynamics (Eq. 3) ───────────────────────────────────────────────
+kappa_v: 0.05   # mean-reversion rate toward theta_v
+theta_v: 1.0    # baseline (target) volatility — sets non-zero floor
+eta_v:   0.85   # return-shock coefficient   (weights rt²)
+gamma_v: 0.001  # crowding coefficient        (weights mt²)
 
-# constraints
-min_vol: 0.0
+# ── Liquidity dynamics (Eq. 4) ────────────────────────────────────────────────
+kappa_l: 0.03   # replenishment rate toward l0
+l0:      1.0    # baseline (target) liquidity
+eta_l:   0.005  # flow-depletion coefficient  (weights |Qt|)
+gamma_l: 0.002  # volatility-withdrawal coeff (weights vt)
+
+# ── Constraints ───────────────────────────────────────────────────────────────
+min_vol:       0.0
 min_liquidity: 1.0e-6
 
-# initial conditions
-x0: 0.0
-v0: 1.0
-l0: 1.0
+# ── Initial conditions ────────────────────────────────────────────────────────
+x0:     0.0   # initial log-price
+v0:     1.0   # initial volatility (set equal to theta_v for a warm start)
+l0_init: 1.0  # initial liquidity  (set equal to l0 for a warm start)
