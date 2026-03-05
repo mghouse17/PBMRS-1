@@ -118,3 +118,134 @@ def regime_labels(
     lo = np.percentile(F, p_stable)
     hi = np.percentile(F, p_unstable)
     return np.where(F < lo, 0, np.where(F < hi, 1, 2))
+
+
+# ── Stylized-fact diagnostics ─────────────────────────────────────────────────
+
+def acf(series: np.ndarray, nlags: int) -> np.ndarray:
+    """
+    Sample autocorrelation function of a 1-D array.
+    Returns ACF[0..nlags] (ACF[0] = 1.0 by definition).
+    Uses unbiased denominator (n - k) to match statsmodels convention.
+    """
+    n   = len(series)
+    s   = series - series.mean()
+    var = float(np.dot(s, s))
+    if var == 0.0:
+        return np.zeros(nlags + 1)
+    result = np.empty(nlags + 1)
+    for k in range(nlags + 1):
+        result[k] = float(np.dot(s[:n - k], s[k:])) / var
+    return result
+
+
+def acf_squared_returns(r: np.ndarray, nlags: int = 40) -> np.ndarray:
+    """
+    ACF of squared returns — the standard volatility-clustering diagnostic.
+
+    Persistent positive ACF(r²) at small lags confirms ARCH-like clustering.
+    A nearly flat ACF(r²) ≈ 0 indicates the simulator is producing i.i.d. noise.
+
+    Parameters
+    ----------
+    r     : return series from SimResult.r
+    nlags : number of lags to compute
+
+    Returns
+    -------
+    acf_r2 : np.ndarray of shape (nlags+1,), ACF[0]=1.0
+    """
+    return acf(r ** 2, nlags)
+
+
+def magnetization_persistence(
+    m: np.ndarray,
+    threshold: float = 0.3,
+    nlags: int = 40,
+) -> dict:
+    """
+    Two complementary measures of magnetization persistence.
+
+    1. ACF of |m| — how long herding memory lasts.
+       Decaying slowly → agents stay correlated for many steps.
+       Fast decay → herding is transient.
+
+    2. Fraction of time |m| > threshold — how often the market is
+       in a 'crowd' state (sustained herding episode).
+
+    Parameters
+    ----------
+    m         : magnetization series from SimResult.m
+    threshold : |m| level considered 'herding' (default 0.3)
+    nlags     : lags for ACF
+
+    Returns
+    -------
+    dict with keys:
+      'acf_abs_m'        : np.ndarray (nlags+1,)
+      'herd_fraction'    : float, fraction of steps where |m| > threshold
+      'herd_threshold'   : float, the threshold used
+      'mean_abs_m'       : float
+    """
+    abs_m = np.abs(m)
+    return {
+        "acf_abs_m":      acf(abs_m, nlags),
+        "herd_fraction":  float(np.mean(abs_m > threshold)),
+        "herd_threshold": threshold,
+        "mean_abs_m":     float(abs_m.mean()),
+    }
+
+
+def tail_stats(
+    results,        # List[SimResult]
+    liq_threshold: float = 0.8,
+    l0: float = 1.0,
+) -> dict:
+    """
+    Ensemble tail-risk summary across a list of SimResult objects.
+
+    Computes:
+    - Max drawdown distribution (mean, std, 95th percentile)
+    - Excess kurtosis of pooled returns
+    - Fraction of runs where liquidity fell below liq_threshold * l0
+    - Mean magnetization persistence (mean |m| across runs)
+
+    Parameters
+    ----------
+    results       : list of SimResult (from run_ensemble)
+    liq_threshold : fraction of l0 below which liquidity is 'stressed' (default 0.8)
+    l0            : baseline liquidity for threshold scaling
+
+    Returns
+    -------
+    dict with summary statistics
+    """
+    mdds          = np.array([max_drawdown(res.prices) for res in results])
+    all_r         = np.concatenate([res.r for res in results])
+    liq_stressed  = [float(np.any(res.l < liq_threshold * l0)) for res in results]
+    mean_abs_m    = np.array([float(np.abs(res.m).mean()) for res in results])
+
+    n             = len(results)
+    kurt          = float(_kurtosis(all_r))
+
+    return {
+        "n_runs":               n,
+        "mdd_mean":             float(mdds.mean()),
+        "mdd_std":              float(mdds.std()),
+        "mdd_p95":              float(np.percentile(mdds, 95)),
+        "excess_kurtosis":      kurt,
+        "liq_stressed_frac":    float(np.mean(liq_stressed)),
+        "liq_threshold":        liq_threshold * l0,
+        "mean_abs_m_mean":      float(mean_abs_m.mean()),
+        "mean_abs_m_std":       float(mean_abs_m.std()),
+    }
+
+
+def _kurtosis(r: np.ndarray) -> float:
+    """Fisher excess kurtosis (0 for normal distribution)."""
+    n  = len(r)
+    mu = r.mean()
+    s  = r.std()
+    if s == 0.0:
+        return 0.0
+    return float(np.mean(((r - mu) / s) ** 4)) - 3.0

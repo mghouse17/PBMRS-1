@@ -123,6 +123,26 @@ def test_update_volatility_shock_raises_vol():
     assert v_shocked > v_calm
 
 
+
+
+def test_update_liquidity_baseline_vol_no_depletion():
+    """At vt=theta_v, the gamma_l term is zero — calm vol does not drain liquidity."""
+    kl = 0.03
+    # theta_v = vt = 1.0 → excess_vol = max(1-1, 0) = 0 → only EWMA and flow matter
+    l_at_baseline_vol = update_liquidity(1-kl, kl*1.0, 0.0, 0.999, 1.0, 0.0, 1.0, 1.0, 1e-6)
+    l_at_zero_vol     = update_liquidity(1-kl, kl*1.0, 0.0, 0.999, 1.0, 0.0, 0.0, 1.0, 1e-6)
+    # gamma_l=0.999 but vt-theta_v=0 vs -1 → same result since max(x,0) kills negative excess
+    assert l_at_baseline_vol == pytest.approx(l_at_zero_vol, abs=1e-12)
+
+
+def test_update_liquidity_excess_vol_depletes():
+    """Excess volatility (vt > theta_v) depletes liquidity; deficit (vt < theta_v) does not."""
+    kl = 0.03
+    l_excess = update_liquidity(1-kl, kl*1.0, 0.0, 0.05, 1.0, 0.0, 2.0, 1.0, 1e-6)  # excess=1
+    l_defcit = update_liquidity(1-kl, kl*1.0, 0.0, 0.05, 1.0, 0.0, 0.5, 1.0, 1e-6)  # deficit → 0
+    assert l_excess < 1.0         # drained by excess vol
+    assert l_defcit == pytest.approx(1.0, abs=1e-12)  # deficit treated as 0; only EWMA
+
 def test_update_volatility_clamped_to_min_vol():
     """Volatility is clamped to min_vol if equation produces a lower value."""
     v_next = update_volatility(0.0, 0.0, 0.0, 0.0,
@@ -138,15 +158,15 @@ def test_update_liquidity_fixed_point():
     """If lt=l0 and Qt=vt=0, liquidity stays at l0."""
     kl = 0.03
     l_next = update_liquidity(1 - kl, kl * 1.0, 0.005, 0.002,
-                               lt=1.0, Qt=0.0, vt=0.0, min_liquidity=1e-6)
+                               lt=1.0, Qt=0.0, vt=1.0, theta_v=1.0, min_liquidity=1e-6)
     assert l_next == pytest.approx(1.0, abs=1e-12)
 
 
 def test_update_liquidity_flow_depletes():
     """Higher order flow reduces liquidity (depletion direction correct)."""
     kl = 0.03
-    l_no   = update_liquidity(1-kl, kl*1.0, 0.005, 0.002, 1.0, 0.0, 0.0, 1e-6)
-    l_flow = update_liquidity(1-kl, kl*1.0, 0.005, 0.002, 1.0, 1.0, 0.0, 1e-6)
+    l_no   = update_liquidity(1-kl, kl*1.0, 0.005, 0.002, 1.0, 0.0, 1.0, 1.0, 1e-6)  # Qt=0, vt=theta_v
+    l_flow = update_liquidity(1-kl, kl*1.0, 0.005, 0.002, 1.0, 1.0, 1.0, 1.0, 1e-6)  # Qt=1
     assert l_flow < l_no
 
 
@@ -161,7 +181,7 @@ def test_update_liquidity_vol_depletes():
 def test_update_liquidity_clamped_to_min():
     """Liquidity must never fall below min_liquidity under extreme depletion."""
     l_next = update_liquidity(0.0, 0.0, 1.0, 1.0,
-                               lt=0.001, Qt=100.0, vt=100.0, min_liquidity=1e-6)
+                               lt=0.001, Qt=100.0, vt=100.0, theta_v=1.0, min_liquidity=1e-6)
     assert l_next >= 1e-6
 
 
@@ -237,8 +257,9 @@ def test_simconfig_valid_default():
     assert cfg.J * cfg.beta < 1.0
 
 
-def test_simconfig_rejects_supercritical():
-    with pytest.raises(ValueError, match="Subcritical condition violated"):
+def test_simconfig_warns_supercritical():
+    """J*beta >= 1 now warns instead of raising — allows near/above-critical exploration."""
+    with pytest.warns(UserWarning, match="supercritical"):
         SimConfig(J=0.9, beta=1.2)
 
 
@@ -370,12 +391,12 @@ def test_no_nans_infs_long_run():
 REGRESSION_CFG = SimConfig(seed=42, timesteps=200, n_agents=200, q0=0.005)
 
 FROZEN = {
-    "x_final":    -0.17399159,
-    "v_mean":      1.00170871,
-    "l_min":       0.92420798,
+    "x_final":    -0.13184288,
+    "v_mean":      1.00580374,
+    "l_min":       0.95901573,
     "m_max":       0.18000000,
-    "r_std":       0.01031599,
-    "prices_min":  0.81881676,
+    "r_std":       0.01032860,
+    "prices_min":  0.85343207,
 }
 
 
@@ -456,3 +477,60 @@ def test_run_ensemble_rejects_mismatched_seeds(base_cfg):
 def test_run_ensemble_all_invariants_hold(base_cfg):
     for result in run_ensemble(base_cfg, n_runs=5):
         check_invariants(result, base_cfg)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# New diagnostic functions  (changes 4-5)
+# ══════════════════════════════════════════════════════════════════════════════
+
+import sys
+sys.path.insert(0, '.')
+from pbmrs_core.diagnostics import (
+    acf, acf_squared_returns, magnetization_persistence, tail_stats,
+)
+
+
+def test_acf_all_ones_series():
+    """ACF of a constant series should be 1.0 at all lags (or 0 by convention when var=0)."""
+    # constant → variance=0, our implementation returns 0.0 array
+    result = acf(np.ones(100), nlags=5)
+    assert result.shape == (6,)
+    assert result[0] == pytest.approx(0.0)  # var=0 case
+
+
+def test_acf_white_noise():
+    """ACF of white noise at lag>0 should be near zero (not exactly — finite sample)."""
+    rng = np.random.default_rng(0)
+    wn  = rng.standard_normal(5000)
+    ac  = acf(wn, nlags=20)
+    assert ac[0] == pytest.approx(1.0, abs=1e-12)
+    assert np.all(np.abs(ac[1:]) < 0.1)  # loose tolerance for finite sample
+
+
+def test_acf_squared_returns_shape(base_result):
+    ac = acf_squared_returns(base_result.r, nlags=20)
+    assert ac.shape == (21,)
+    assert ac[0] == pytest.approx(1.0, abs=1e-12)
+
+
+def test_magnetization_persistence_keys(base_result):
+    mp = magnetization_persistence(base_result.m, threshold=0.2, nlags=10)
+    assert "acf_abs_m"     in mp
+    assert "herd_fraction" in mp
+    assert "herd_threshold" in mp
+    assert mp["herd_threshold"] == pytest.approx(0.2)
+    assert 0.0 <= mp["herd_fraction"] <= 1.0
+    assert mp["acf_abs_m"].shape == (11,)
+    assert mp["acf_abs_m"][0] == pytest.approx(1.0, abs=1e-2)  # loose: small series
+
+
+def test_tail_stats_keys(base_cfg):
+    results = run_ensemble(base_cfg, n_runs=5)
+    ts = tail_stats(results, l0=base_cfg.l0)
+    for key in ["n_runs", "mdd_mean", "mdd_std", "mdd_p95",
+                "excess_kurtosis", "liq_stressed_frac",
+                "mean_abs_m_mean", "mean_abs_m_std"]:
+        assert key in ts, f"Missing key: {key}"
+    assert ts["n_runs"] == 5
+    assert 0.0 <= ts["mdd_mean"] <= 1.0
+    assert 0.0 <= ts["liq_stressed_frac"] <= 1.0

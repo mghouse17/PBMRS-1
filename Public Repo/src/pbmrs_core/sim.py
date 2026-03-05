@@ -28,11 +28,15 @@ class SimConfig:
     kappa_v:    float = 0.05
     theta_v:    float = 1.0
     eta_v:      float = 0.85
-    gamma_v:    float = 0.001
+    gamma_v:    float = 0.050  # raised: crowding now meaningfully amplifies vol (was 0.001)
     kappa_l:    float = 0.03
     l0:         float = 1.0
-    eta_l:      float = 0.005
-    gamma_l:    float = 0.002
+    eta_l:      float = 0.015  # raised: flow depletion noticeable at Qt~0.5 (was 0.005)
+    gamma_l:    float = 0.030  # raised (excess-vol only after fix 1): equivalent stress response (was 0.002)
+    # ── Price-impact floor ────────────────────────────────────────────────
+    # Prevents Qt/(lt) from exploding when lt → min_liquidity.
+    # Effective denominator: max(lt, impact_eps). Default 1% of l0=1.0.
+    impact_eps:     float = 0.010
     min_vol:        float = 0.0
     min_liquidity:  float = 1e-6
     x0:     float = 0.0
@@ -57,16 +61,21 @@ class SimConfig:
             errors.append(f"theta_v must be > 0 (got {self.theta_v})")
         if self.l0 <= 0.0:
             errors.append(f"l0 must be > 0 (got {self.l0})")
-        jb = self.J * self.beta
-        if jb >= 1.0:
-            errors.append(
-                f"Subcritical condition violated: J * beta = {jb:.4f} >= 1.0. "
-                f"Reduce J below 1/beta = {1.0/self.beta:.4f}."
-            )
         if errors:
             raise ValueError(
                 f"Invalid SimConfig ({len(errors)} error(s)):\n"
                 + "\n".join(f"  - {e}" for e in errors)
+            )
+        # Soft warnings — bad but not crash-inducing
+        jb = self.J * self.beta
+        if jb >= 1.0:
+            warnings.warn(
+                f"J * beta = {jb:.4f} >= 1.0 (supercritical). "
+                f"Agents will spontaneously lock to m = ±1. "
+                f"This is intentional if you are exploring near/above criticality; "
+                f"logit clipping keeps numerics safe. "
+                f"Subcritical boundary: J < {1.0/self.beta:.4f}.",
+                UserWarning, stacklevel=2,
             )
         flow_scale = self.q0 * self.n_agents
         if not (0.5 <= flow_scale <= 2.0):
@@ -97,6 +106,8 @@ class _SimCache:
     kv_target:    float
     one_minus_kl: float
     kl_l0:        float
+    theta_v:      float   # needed by update_liquidity (excess-vol fix)
+    impact_eps:   float   # needed by compute_return (impact floor fix)
 
     @classmethod
     def from_config(cls, cfg: SimConfig) -> "_SimCache":
@@ -108,6 +119,8 @@ class _SimCache:
             kv_target    = cfg.kappa_v * cfg.theta_v,
             one_minus_kl = 1.0 - cfg.kappa_l,
             kl_l0        = cfg.kappa_l * cfg.l0,
+            theta_v      = cfg.theta_v,
+            impact_eps   = cfg.impact_eps,
         )
 
 
@@ -119,9 +132,15 @@ def compute_flow(flow_scale: float, mt: float) -> float:
 
 
 def compute_return(drift: float, lam: float, Qt: float, lt: float,
-                   vt: float, sqrt_dt: float, sigma_eps: float, eps: float) -> float:
-    """Eq. 2: rt = mu0*dt + lam*(Qt/lt) + sqrt(vt*dt)*sigma_eps*eps"""
-    return drift + lam * (Qt / lt) + np.sqrt(max(vt, 0.0)) * sqrt_dt * sigma_eps * eps
+                   vt: float, sqrt_dt: float, sigma_eps: float, eps: float,
+                   impact_eps: float = 0.0) -> float:
+    """Eq. 2: rt = mu0*dt + lam*(Qt/max(lt,impact_eps)) + sqrt(vt*dt)*sigma_eps*eps
+
+    impact_eps: soft floor on lt in the denominator (change 6).
+    Prevents exploding impact when lt is clamped near min_liquidity.
+    """
+    eff_liq = max(lt, impact_eps)
+    return drift + lam * (Qt / eff_liq) + np.sqrt(max(vt, 0.0)) * sqrt_dt * sigma_eps * eps
 
 
 def update_volatility(one_minus_kv: float, kv_target: float,
@@ -135,10 +154,19 @@ def update_volatility(one_minus_kv: float, kv_target: float,
 
 def update_liquidity(one_minus_kl: float, kl_l0: float,
                       eta_l: float, gamma_l: float,
-                      lt: float, Qt: float, vt: float, min_liquidity: float) -> float:
-    """Eq. 4: lt+1 = (1-kl)*lt + kl*l0 - eta_l*|Qt| - gamma_l*vt"""
+                      lt: float, Qt: float, vt: float,
+                      theta_v: float, min_liquidity: float) -> float:
+    """Eq. 4: lt+1 = (1-kl)*lt + kl*l0 - eta_l*|Qt| - gamma_l*max(vt-theta_v, 0)
+
+    Change 1: penalise EXCESS volatility (vt - theta_v) instead of absolute vt.
+    Fixed point: if lt=l0 and Qt=0 and vt=theta_v, then lt+1 = l0 exactly.
+    At baseline vol (vt=theta_v), the gamma_l term is zero — calm regimes stay calm.
+    Only vol above the baseline drains liquidity.
+    """
+    excess_vol = max(vt - theta_v, 0.0)
     l_next = (one_minus_kl * lt + kl_l0
-              - eta_l * abs(Qt) - gamma_l * vt)
+              - eta_l * abs(Qt)
+              - gamma_l * excess_vol)
     return max(l_next, min_liquidity)
 
 
@@ -193,6 +221,8 @@ def run_sim(cfg: SimConfig, _cache: Optional[_SimCache] = None) -> SimResult:
     kv_target    = _cache.kv_target
     one_minus_kl = _cache.one_minus_kl
     kl_l0        = _cache.kl_l0
+    theta_v      = _cache.theta_v
+    impact_eps   = _cache.impact_eps
     lam           = cfg.lam
     sigma_eps     = cfg.sigma_eps
     eta_v         = cfg.eta_v
@@ -214,13 +244,14 @@ def run_sim(cfg: SimConfig, _cache: Optional[_SimCache] = None) -> SimResult:
 
         Qt     = compute_flow(flow_scale, mt)
         eps    = rng.standard_normal()
-        rt     = compute_return(drift, lam, Qt, l[t], v[t], sqrt_dt, sigma_eps, eps)
+        rt     = compute_return(drift, lam, Qt, l[t], v[t], sqrt_dt, sigma_eps, eps,
+                                impact_eps)
         x[t+1] = x[t] + rt
 
         v[t+1] = update_volatility(one_minus_kv, kv_target, eta_v, gamma_v,
                                     v[t], rt, mt, min_vol)
         l[t+1] = update_liquidity(one_minus_kl, kl_l0, eta_l, gamma_l,
-                                   l[t], Qt, v[t], min_liquidity)
+                                   l[t], Qt, v[t], theta_v, min_liquidity)
         ht     = compute_field(alpha_r, alpha_v, alpha_l, alpha_0,
                                rt, v[t+1], l[t+1], l0)
         new_m  = update_agents(rng, beta, J, mt, ht, s, draws)
