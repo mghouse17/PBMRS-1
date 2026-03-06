@@ -1,13 +1,37 @@
 """
 sim.py — PBMRS Core Simulation Loop
+Version: 0.2.2
+
+Architecture changes vs 0.2.0:
+  [Arch-1] _cache removed from run_sim public signature.
+           run_ensemble uses internal _run_sim_with_cache().
+  [Arch-2] l0_init removed; initial liquidity derived as max(l0, min_liquidity).
+  [Arch-4] Cross-parameter stability warnings added to SimConfig.__post_init__.
+
+Code quality changes vs 0.2.1:
+  [CQ-6]  Liquidity update now uses v[t+1] instead of v[t] — volatility spike
+          immediately depletes liquidity in the same step (tighter feedback).
+  [CQ-8]  NEAR_CRITICAL_MT2_HEURISTIC exported as named constant.
 """
 from __future__ import annotations
+import math
 import warnings
 import dataclasses
 from dataclasses import dataclass
 from typing import List, NamedTuple, Optional
 import numpy as np
 
+
+# ── Module-level constants ────────────────────────────────────────────────────
+
+# [CQ-8] Single source of truth for near-critical E[mt²] approximation.
+# At J·β → 1⁻, mean-field Ising gives E[mt²] that grows from 0.
+# 0.25 is a conservative empirical estimate from subcritical runs near J·β=0.85.
+# Import this in notebooks/analysis code rather than repeating the literal.
+NEAR_CRITICAL_MT2_HEURISTIC: float = 0.25
+
+
+# ── SimConfig ─────────────────────────────────────────────────────────────────
 
 @dataclass
 class SimConfig:
@@ -17,33 +41,45 @@ class SimConfig:
     n_agents:   int   = 2000
     q0:         float = 5e-4
     beta:       float = 1.2
-    J:          float = 0.5
-    alpha_r:    float =  1.0
-    alpha_v:    float =  0.001
-    alpha_l:    float =  0.1
-    alpha_0:    float =  0.0
+    J:          float = 0.5    # J*beta=0.60 (subcritical). Critical boundary: J < 1/beta.
+
+    # Market field weights (Eq. 5)
+    alpha_r:    float =  1.0   # trend-following weight
+    alpha_v:    float =  0.001 # volatility-aversion weight
+    alpha_l:    float =  0.1   # liquidity-stress weight
+    alpha_0:    float =  0.0   # baseline behavioral bias
+
+    # Return dynamics (Eq. 2)
     mu0:        float = 0.0
     lam:        float = 0.05
     sigma_eps:  float = 0.01
+
+    # Volatility dynamics (Eq. 3)
     kappa_v:    float = 0.05
     theta_v:    float = 1.0
-    eta_v:      float = 0.85
-    gamma_v:    float = 0.050  # raised: crowding now meaningfully amplifies vol (was 0.001)
+    eta_v:      float = 0.85   # ARCH amplification. Stability bound: eta_v < kappa_v / (typical rt²)
+    gamma_v:    float = 0.050  # crowding amplification. Raises steady-state vol by gamma_v*E[mt²]/kappa_v
+
+    # Liquidity dynamics (Eq. 4)
     kappa_l:    float = 0.03
-    l0:         float = 1.0
-    eta_l:      float = 0.015  # raised: flow depletion noticeable at Qt~0.5 (was 0.005)
-    gamma_l:    float = 0.030  # raised (excess-vol only after fix 1): equivalent stress response (was 0.002)
-    # ── Price-impact floor ────────────────────────────────────────────────
-    # Prevents Qt/(lt) from exploding when lt → min_liquidity.
-    # Effective denominator: max(lt, impact_eps). Default 1% of l0=1.0.
+    l0:         float = 1.0    # baseline AND initial liquidity (see Arch-2)
+    eta_l:      float = 0.015  # flow depletion
+    gamma_l:    float = 0.030  # excess-vol depletion (only fires above theta_v)
+
+    # Price-impact floor (Eq. 2) — prevents Qt/lt exploding near min_liquidity
     impact_eps:     float = 0.010
+
+    # Hard constraints
     min_vol:        float = 0.0
     min_liquidity:  float = 1e-6
+
+    # Initial conditions
     x0:     float = 0.0
     v0:     float = 1.0
-    l0_init: float = 1.0
+    # NOTE: l0_init removed (Arch-2). Initial liquidity = max(l0, min_liquidity).
 
     def __post_init__(self) -> None:
+        # ── Hard errors ──────────────────────────────────────────────────────
         errors: List[str] = []
         if self.min_liquidity <= 0.0:
             errors.append(f"min_liquidity must be > 0 (got {self.min_liquidity})")
@@ -66,7 +102,8 @@ class SimConfig:
                 f"Invalid SimConfig ({len(errors)} error(s)):\n"
                 + "\n".join(f"  - {e}" for e in errors)
             )
-        # Soft warnings — bad but not crash-inducing
+
+        # ── Soft warnings — dangerous but not crash-inducing ─────────────────
         jb = self.J * self.beta
         if jb >= 1.0:
             warnings.warn(
@@ -77,6 +114,7 @@ class SimConfig:
                 f"Subcritical boundary: J < {1.0/self.beta:.4f}.",
                 UserWarning, stacklevel=2,
             )
+
         flow_scale = self.q0 * self.n_agents
         if not (0.5 <= flow_scale <= 2.0):
             warnings.warn(
@@ -85,20 +123,65 @@ class SimConfig:
                 UserWarning, stacklevel=2,
             )
 
+        # [Arch-4] Cross-parameter stability warnings
+        # Volatility EWMA stability: requires eta_v * E[rt²] << kappa_v
+        # At typical rt_std ~ sigma_eps * sqrt(theta_v) ≈ 0.01, E[rt²] ≈ 1e-4
+        # Rough bound: if eta_v > kappa_v / (sigma_eps² * theta_v), vol may not revert
+        approx_rt2 = (self.sigma_eps ** 2) * self.theta_v
+        eta_v_stability_bound = self.kappa_v / approx_rt2 if approx_rt2 > 0 else float('inf')
+        if self.eta_v > eta_v_stability_bound:
+            warnings.warn(
+                f"eta_v={self.eta_v:.4f} may cause volatility to not mean-revert. "
+                f"Rough stability bound: eta_v < kappa_v / (sigma_eps² * theta_v) "
+                f"= {eta_v_stability_bound:.2f}. "
+                f"Check that v_t remains bounded in long runs.",
+                UserWarning, stacklevel=2,
+            )
+
+        # impact_eps > l0 silently disables the impact channel
+        if self.impact_eps >= self.l0:
+            warnings.warn(
+                f"impact_eps={self.impact_eps} >= l0={self.l0}. "
+                f"Price impact floor is at or above baseline liquidity — "
+                f"the liquidity feedback channel is effectively disabled.",
+                UserWarning, stacklevel=2,
+            )
+
+        # Steady-state vol elevation from crowding (at mean-field mt approximation)
+        # At near-critical J, E[mt²] can be ~0.2–0.4. Warn if crowding raises vol > 50% above theta_v.
+        crowding_vol_elevation = self.gamma_v * NEAR_CRITICAL_MT2_HEURISTIC / self.kappa_v
+        if crowding_vol_elevation > 0.5 * self.theta_v:
+            warnings.warn(
+                f"At near-critical herding (E[mt²]~0.25), gamma_v={self.gamma_v} raises "
+                f"steady-state volatility by ~{crowding_vol_elevation:.2f} above theta_v={self.theta_v} "
+                f"({crowding_vol_elevation/self.theta_v:.0%} elevation). "
+                f"This may dominate the return signal at high J.",
+                UserWarning, stacklevel=2,
+            )
+
+
+# ── SimResult ─────────────────────────────────────────────────────────────────
 
 class SimResult(NamedTuple):
-    x:      np.ndarray
-    v:      np.ndarray
-    l:      np.ndarray
-    m:      np.ndarray
-    Q:      np.ndarray
-    r:      np.ndarray
-    h:      np.ndarray
-    prices: np.ndarray
+    x:      np.ndarray   # log-price, shape (T+1,)
+    v:      np.ndarray   # volatility, shape (T+1,)
+    l:      np.ndarray   # liquidity, shape (T+1,)
+    m:      np.ndarray   # magnetization, shape (T+1,)
+    Q:      np.ndarray   # order flow, shape (T,)
+    r:      np.ndarray   # returns, shape (T,)
+    h:      np.ndarray   # market field, shape (T,)
+    prices: np.ndarray   # price level exp(x), shape (T+1,)
 
+
+# ── _SimCache (internal only) ─────────────────────────────────────────────────
 
 @dataclass
 class _SimCache:
+    """
+    Pre-computed scalars derived from SimConfig. Internal to this module.
+    All fields are immutable floats — safe to share across runs in run_ensemble.
+    Do NOT add mutable state (e.g. arrays) here without updating run_ensemble.
+    """
     flow_scale:   float
     drift:        float
     sqrt_dt:      float
@@ -106,8 +189,9 @@ class _SimCache:
     kv_target:    float
     one_minus_kl: float
     kl_l0:        float
-    theta_v:      float   # needed by update_liquidity (excess-vol fix)
-    impact_eps:   float   # needed by compute_return (impact floor fix)
+    theta_v:      float
+    impact_eps:   float
+    l0_init:      float   # derived: max(cfg.l0, cfg.min_liquidity)
 
     @classmethod
     def from_config(cls, cfg: SimConfig) -> "_SimCache":
@@ -121,6 +205,7 @@ class _SimCache:
             kl_l0        = cfg.kappa_l * cfg.l0,
             theta_v      = cfg.theta_v,
             impact_eps   = cfg.impact_eps,
+            l0_init      = max(cfg.l0, cfg.min_liquidity),  # [Arch-2]
         )
 
 
@@ -134,13 +219,12 @@ def compute_flow(flow_scale: float, mt: float) -> float:
 def compute_return(drift: float, lam: float, Qt: float, lt: float,
                    vt: float, sqrt_dt: float, sigma_eps: float, eps: float,
                    impact_eps: float = 0.0) -> float:
-    """Eq. 2: rt = mu0*dt + lam*(Qt/max(lt,impact_eps)) + sqrt(vt*dt)*sigma_eps*eps
-
-    impact_eps: soft floor on lt in the denominator (change 6).
-    Prevents exploding impact when lt is clamped near min_liquidity.
-    """
+    """Eq. 2: rt = mu0*dt + lam*(Qt/max(lt,impact_eps)) + sqrt(vt*dt)*sigma_eps*eps"""
     eff_liq = max(lt, impact_eps)
-    return drift + lam * (Qt / eff_liq) + np.sqrt(max(vt, 0.0)) * sqrt_dt * sigma_eps * eps
+    # math.sqrt is ~3x faster than np.sqrt for Python scalars.
+    # vt >= min_vol >= 0 is guaranteed by update_volatility — guard is redundant.
+    # [CQ-14] Removed max(vt, 0.0); invariant documented here.
+    return drift + lam * (Qt / eff_liq) + math.sqrt(vt) * sqrt_dt * sigma_eps * eps
 
 
 def update_volatility(one_minus_kv: float, kv_target: float,
@@ -158,10 +242,8 @@ def update_liquidity(one_minus_kl: float, kl_l0: float,
                       theta_v: float, min_liquidity: float) -> float:
     """Eq. 4: lt+1 = (1-kl)*lt + kl*l0 - eta_l*|Qt| - gamma_l*max(vt-theta_v, 0)
 
-    Change 1: penalise EXCESS volatility (vt - theta_v) instead of absolute vt.
-    Fixed point: if lt=l0 and Qt=0 and vt=theta_v, then lt+1 = l0 exactly.
-    At baseline vol (vt=theta_v), the gamma_l term is zero — calm regimes stay calm.
-    Only vol above the baseline drains liquidity.
+    Penalises EXCESS volatility only (vt - theta_v), not absolute vol.
+    Fixed point: if lt=l0, Qt=0, vt=theta_v → lt+1 = l0. Calm stays calm.
     """
     excess_vol = max(vt - theta_v, 0.0)
     l_next = (one_minus_kl * lt + kl_l0
@@ -189,12 +271,14 @@ def update_agents(rng: np.random.Generator, beta: float, J: float,
     return float(np.mean(s))
 
 
-# ── run_sim ────────────────────────────────────────────────────────────────────
+# ── _run_sim_with_cache (internal) ─────────────────────────────────────────────
 
-def run_sim(cfg: SimConfig, _cache: Optional[_SimCache] = None) -> SimResult:
-    if _cache is None:
-        _cache = _SimCache.from_config(cfg)
-
+def _run_sim_with_cache(cfg: SimConfig, cache: _SimCache) -> SimResult:
+    """
+    Internal implementation used by both run_sim and run_ensemble.
+    Accepts a pre-built _SimCache to avoid redundant recomputation in ensembles.
+    Not part of the public API.
+    """
     rng = np.random.default_rng(cfg.seed)
     T   = cfg.timesteps
 
@@ -210,19 +294,21 @@ def run_sim(cfg: SimConfig, _cache: Optional[_SimCache] = None) -> SimResult:
     draws = np.empty(cfg.n_agents)
 
     x[0]     = cfg.x0
-    v[0]     = max(cfg.v0,      cfg.min_vol)
-    l[0]     = max(cfg.l0_init, cfg.min_liquidity)
+    v[0]     = max(cfg.v0, cfg.min_vol)
+    l[0]     = cache.l0_init                 # [Arch-2]: derived from l0 in cache
     m_arr[0] = float(np.mean(s))
 
-    flow_scale   = _cache.flow_scale
-    drift        = _cache.drift
-    sqrt_dt      = _cache.sqrt_dt
-    one_minus_kv = _cache.one_minus_kv
-    kv_target    = _cache.kv_target
-    one_minus_kl = _cache.one_minus_kl
-    kl_l0        = _cache.kl_l0
-    theta_v      = _cache.theta_v
-    impact_eps   = _cache.impact_eps
+    # Unpack cache into locals for tight loop performance
+    flow_scale   = cache.flow_scale
+    drift        = cache.drift
+    sqrt_dt      = cache.sqrt_dt
+    one_minus_kv = cache.one_minus_kv
+    kv_target    = cache.kv_target
+    one_minus_kl = cache.one_minus_kl
+    kl_l0        = cache.kl_l0
+    theta_v      = cache.theta_v
+    impact_eps   = cache.impact_eps
+
     lam           = cfg.lam
     sigma_eps     = cfg.sigma_eps
     eta_v         = cfg.eta_v
@@ -251,7 +337,7 @@ def run_sim(cfg: SimConfig, _cache: Optional[_SimCache] = None) -> SimResult:
         v[t+1] = update_volatility(one_minus_kv, kv_target, eta_v, gamma_v,
                                     v[t], rt, mt, min_vol)
         l[t+1] = update_liquidity(one_minus_kl, kl_l0, eta_l, gamma_l,
-                                   l[t], Qt, v[t], theta_v, min_liquidity)
+                                   l[t], Qt, v[t+1], theta_v, min_liquidity)  # [CQ-6] v[t+1] not v[t]
         ht     = compute_field(alpha_r, alpha_v, alpha_l, alpha_0,
                                rt, v[t+1], l[t+1], l0)
         new_m  = update_agents(rng, beta, J, mt, ht, s, draws)
@@ -265,29 +351,56 @@ def run_sim(cfg: SimConfig, _cache: Optional[_SimCache] = None) -> SimResult:
                      prices=np.exp(x))
 
 
-# ── run_ensemble ───────────────────────────────────────────────────────────────
+# ── run_sim (public) ──────────────────────────────────────────────────────────
+
+def run_sim(cfg: SimConfig) -> SimResult:
+    """
+    Run a single simulation path.
+
+    Parameters
+    ----------
+    cfg : SimConfig — fully determines the run (config + seed = reproducible path)
+
+    Returns
+    -------
+    SimResult with all state variables and prices arrays.
+
+    Notes
+    -----
+    [Arch-1] _cache is no longer a public parameter. Call run_ensemble() for
+    multiple runs — it handles cache reuse internally.
+    """
+    cache = _SimCache.from_config(cfg)
+    return _run_sim_with_cache(cfg, cache)
+
+
+# ── run_ensemble (public) ─────────────────────────────────────────────────────
 
 def run_ensemble(cfg: SimConfig, n_runs: int,
                   seeds: Optional[List[int]] = None) -> List[SimResult]:
     """
     Run n_runs independent paths from the same base config.
-    _SimCache is built once and reused across all runs.
-    # TODO: Phase 2 — vectorise across runs (batched RNG, stacked arrays).
+
+    Seeds default to [0, 1, ..., n_runs-1]. Pass explicit seeds for
+    non-contiguous or reproducible subsets.
+
+    _SimCache is built once and shared — safe because all cache fields are
+    immutable floats (no mutable arrays). See _SimCache docstring.
     """
     if seeds is None:
         seeds = list(range(n_runs))
     if len(seeds) != n_runs:
         raise ValueError(f"len(seeds)={len(seeds)} must equal n_runs={n_runs}")
     cache = _SimCache.from_config(cfg)
-    return [run_sim(dataclasses.replace(cfg, seed=s), _cache=cache) for s in seeds]
+    return [_run_sim_with_cache(dataclasses.replace(cfg, seed=s), cache) for s in seeds]
 
 
-# ── check_invariants ───────────────────────────────────────────────────────────
+# ── check_invariants (public) ─────────────────────────────────────────────────
 
 def check_invariants(result: SimResult, cfg: SimConfig) -> None:
     """
     Validate hard model invariants. Raises ValueError listing ALL violations.
-    Silent on success — safe to use in test suites without stdout pollution.
+    Silent on success — safe to call in test suites.
     """
     errors: List[str] = []
 

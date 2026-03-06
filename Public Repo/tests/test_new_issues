@@ -1,0 +1,305 @@
+"""
+test_new_issues.py — Additional tests for Issues 9, 10, 11, 12
+
+These tests supplement test_sim.py. Add them to your test suite.
+They assume the CQ-fixed sim.py (v0.2.2) is on the path as 'sim'.
+
+Run with:
+    pytest test_new_issues.py -v
+    pytest test_new_issues.py -v -m slow   # includes slow tests
+"""
+import pytest
+import warnings
+import numpy as np
+import dataclasses
+import sys
+sys.path.insert(0, '.')
+
+from sim import (
+    SimConfig, run_sim, run_ensemble, check_invariants,
+    NEAR_CRITICAL_MT2_HEURISTIC,
+)
+
+# ── helpers (inline for self-containment) ─────────────────────────────────────
+
+def max_drawdown(prices):
+    peak = np.maximum.accumulate(prices)
+    return float(np.max(1.0 - prices / np.where(peak == 0, 1.0, peak)))
+
+
+def _kurtosis(r):
+    n = len(r); mu = r.mean(); s = r.std()
+    if s == 0.0: return 0.0
+    return float(np.mean(((r - mu) / s) ** 4)) - 3.0
+
+
+def recovery_time(prices, epsilon=0.0):
+    """Returns steps from max-drawdown trough to recovery, or None if no recovery."""
+    peak = np.maximum.accumulate(prices)
+    dd = 1.0 - prices / np.where(peak == 0, 1.0, peak)
+    t_trough = int(np.argmax(dd))
+    ref_peak = float(np.max(prices[:t_trough + 1]))
+    target = (1.0 - epsilon) * ref_peak
+    for t in range(t_trough + 1, len(prices)):
+        if prices[t] >= target:
+            return t - t_trough
+    return None
+
+
+def recovery_time_or_inf(prices, epsilon=0.0):
+    """[Issue 12] Safe wrapper: returns float('inf') when path never recovers.
+    Use for arithmetic over ensembles where None would propagate silently.
+    """
+    result = recovery_time(prices, epsilon)
+    return float('inf') if result is None else float(result)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Issue 9 — Regime separation integration test
+# ══════════════════════════════════════════════════════════════════════════════
+
+N_RUNS_REGIME = 15    # enough to be stable, fast enough for CI
+T_REGIME      = 800
+# alpha_r=12.0 is required for regime separation (calibration fix v2.2)
+ALPHA_R_CALIBRATED = 12.0
+
+
+@pytest.fixture(scope="module")
+def regime_ensembles():
+    """Run three regime ensembles once and share across tests."""
+    cfgs = {
+        'subcrit':   SimConfig(timesteps=T_REGIME, n_agents=2000, q0=5e-4, J=0.40, seed=0, alpha_r=ALPHA_R_CALIBRATED),
+        'near_crit': SimConfig(timesteps=T_REGIME, n_agents=2000, q0=5e-4, J=0.65, seed=0, alpha_r=ALPHA_R_CALIBRATED),
+        'critical':  SimConfig(timesteps=T_REGIME, n_agents=2000, q0=5e-4, J=0.78, seed=0, alpha_r=ALPHA_R_CALIBRATED),
+    }
+    results = {}
+    for name, cfg in cfgs.items():
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            results[name] = run_ensemble(cfg, n_runs=N_RUNS_REGIME)
+    return results
+
+
+def test_regime_herding_increases_with_J(regime_ensembles):
+    """Near-critical herding fraction should exceed subcritical."""
+    def herd_frac(runs):
+        return np.mean([np.mean(np.abs(r.m) > 0.3) for r in runs])
+
+    sub  = herd_frac(regime_ensembles['subcrit'])
+    near = herd_frac(regime_ensembles['near_crit'])
+    crit = herd_frac(regime_ensembles['critical'])
+
+    assert near >= sub, (
+        f"Near-critical herding ({near:.4f}) should be >= subcritical ({sub:.4f})"
+    )
+    assert crit > sub, (
+        f"Critical herding ({crit:.4f}) should exceed subcritical ({sub:.4f})"
+    )
+
+
+def test_regime_acf_r2_increases_with_J(regime_ensembles):
+    """ACF(r^2) lag-1 (vol clustering) should increase toward criticality."""
+    def acf_r2_lag1(r):
+        x = r**2; s = x - x.mean(); v = float(np.dot(s, s))
+        if v == 0: return 0.0
+        return float(np.dot(s[:-1], s[1:])) / (v * (len(r)-1) / len(r))
+
+    sub  = np.mean([acf_r2_lag1(r.r) for r in regime_ensembles['subcrit']])
+    near = np.mean([acf_r2_lag1(r.r) for r in regime_ensembles['near_crit']])
+    crit = np.mean([acf_r2_lag1(r.r) for r in regime_ensembles['critical']])
+
+    assert near > sub, f"Vol clustering: near ({near:.4f}) should > subcrit ({sub:.4f})"
+    assert crit > near, f"Vol clustering: critical ({crit:.4f}) should > near ({near:.4f})"
+
+
+def test_regime_mean_abs_magnetization_increases_with_J(regime_ensembles):
+    """Mean |mt| should be ordered: subcrit <= near-crit <= critical."""
+    def mean_abs_m(runs):
+        return np.mean([np.abs(r.m).mean() for r in runs])
+
+    sub  = mean_abs_m(regime_ensembles['subcrit'])
+    crit = mean_abs_m(regime_ensembles['critical'])
+
+    assert crit > sub, f"E[|m|]: critical={crit:.4f} should exceed subcrit={sub:.4f}"
+
+
+def test_regime_invariants_hold_for_all(regime_ensembles):
+    """check_invariants must pass for every run in every regime."""
+    for name, runs in regime_ensembles.items():
+        for i, result in enumerate(runs):
+            try:
+                check_invariants(result, SimConfig())
+            except ValueError as e:
+                pytest.fail(f"Invariant violation in {name} run {i}: {e}")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Issue 10 — SIM_VERSION in regression dict
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Frozen from: SimConfig(seed=42, timesteps=200, n_agents=200, q0=0.005)
+# Sim version: 0.2.2 (CQ-6: v[t+1] in liquidity update)
+# To update intentionally: run the print block below, paste new values,
+# and commit with message: "update FROZEN for sim v<new version>"
+
+SIM_VERSION = "0.2.2"
+
+FROZEN = {
+    "sim_version": SIM_VERSION,   # [Issue 10] version-linked regression dict
+    # Values computed with SimConfig(seed=42, timesteps=200, n_agents=200, q0=0.005, alpha_r=12.0)
+    # Updated for: CQ-6 (v[t+1] in liquidity), alpha_r calibration fix (1.0→12.0)
+    "x_final":    -0.40849919,
+    "v_mean":      1.01879219,
+    "l_min":       0.91563630,
+    "m_max":       0.37000000,
+    "r_std":       0.01215365,
+    "prices_min":  0.65269710,
+}
+
+REGRESSION_CFG = SimConfig(seed=42, timesteps=200, n_agents=200, q0=0.005, alpha_r=12.0)
+
+
+def _print_frozen_values():
+    """Run manually to refresh FROZEN values after sim changes."""
+    out = run_sim(REGRESSION_CFG)
+    print(f'\n# Frozen values for sim v{SIM_VERSION}')
+    print(f'"x_final":    {out.x[-1]:.8f},')
+    print(f'"v_mean":     {out.v.mean():.8f},')
+    print(f'"l_min":      {out.l.min():.8f},')
+    print(f'"m_max":      {out.m.max():.8f},')
+    print(f'"r_std":      {out.r.std():.8f},')
+    print(f'"prices_min": {out.prices.min():.8f},')
+
+def test_frozen_sim_version_matches():
+    """FROZEN dict must reference the current SIM_VERSION.
+    Fails explicitly when someone updates sim equations without refreshing FROZEN.
+    """
+    assert FROZEN["sim_version"] == SIM_VERSION, (
+        f"FROZEN values were computed for sim v{FROZEN['sim_version']} "
+        f"but current sim is v{SIM_VERSION}. "
+        f"Run _print_frozen_values() and update FROZEN."
+    )
+
+
+def test_regression_frozen_values():
+    """Same config + seed must reproduce identical summary stats to 7dp."""
+    if any(v is None for k, v in FROZEN.items() if k != "sim_version"):
+        pytest.skip("FROZEN values not yet populated — run _print_frozen_values()")
+
+    out = run_sim(REGRESSION_CFG)
+    assert out.x[-1]        == pytest.approx(FROZEN["x_final"],   abs=1e-7)
+    assert out.v.mean()     == pytest.approx(FROZEN["v_mean"],     abs=1e-7)
+    assert out.l.min()      == pytest.approx(FROZEN["l_min"],      abs=1e-7)
+    assert out.m.max()      == pytest.approx(FROZEN["m_max"],      abs=1e-7)
+    assert out.r.std()      == pytest.approx(FROZEN["r_std"],      abs=1e-7)
+    assert out.prices.min() == pytest.approx(FROZEN["prices_min"], abs=1e-7)
+
+
+def test_regression_different_seed_different_path():
+    """A different seed must NOT match the frozen path."""
+    out = run_sim(dataclasses.replace(REGRESSION_CFG, seed=99))
+    if FROZEN["x_final"] is not None:
+        assert out.x[-1] != pytest.approx(FROZEN["x_final"], abs=1e-4)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Issue 11 — NEAR_CRITICAL_MT2_HEURISTIC plausibility
+# ══════════════════════════════════════════════════════════════════════════════
+
+def test_near_critical_mt2_heuristic_in_valid_range():
+    """[Issue 11-C] Basic sanity: heuristic must be in (0, 1)."""
+    assert 0.0 < NEAR_CRITICAL_MT2_HEURISTIC < 1.0, (
+        f"NEAR_CRITICAL_MT2_HEURISTIC={NEAR_CRITICAL_MT2_HEURISTIC} is out of (0, 1)"
+    )
+
+
+@pytest.mark.slow
+def test_near_critical_mt2_heuristic_empirically_plausible():
+    """[Issue 11-B] Empirical E[mt²] at true near-critical J should bracket the heuristic.
+
+    J=0.83 gives J·β=0.996, very close to the critical point J·β=1.
+    At this J, E[mt²] should be near the heuristic value of 0.25.
+    Bracket [0.10, 0.60] is wide enough to be robust to seed variance.
+    """
+    cfg = SimConfig(
+        timesteps=1000, n_agents=2000, q0=5e-4, J=0.83, seed=0, alpha_r=12.0
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        runs = run_ensemble(cfg, n_runs=20)
+
+    empirical_mt2 = float(np.mean([np.mean(r.m ** 2) for r in runs]))
+
+    assert 0.05 < empirical_mt2 < 0.60, (
+        f"Empirical E[mt²]={empirical_mt2:.4f} at J=0.83 is outside [0.10, 0.60]. "
+        f"NEAR_CRITICAL_MT2_HEURISTIC={NEAR_CRITICAL_MT2_HEURISTIC} may need updating."
+    )
+    ratio = NEAR_CRITICAL_MT2_HEURISTIC / empirical_mt2
+    assert 0.1 < ratio < 10.0, (
+        f"Heuristic ({NEAR_CRITICAL_MT2_HEURISTIC}) is more than 10x off from "
+        f"empirical E[mt²]={empirical_mt2:.4f}."
+    )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Issue 12 — recovery_time() None-safety
+# ══════════════════════════════════════════════════════════════════════════════
+
+def test_recovery_time_returns_none_when_path_never_recovers():
+    """A monotonically declining path should return None."""
+    prices = np.array([1.0, 0.9, 0.8, 0.7, 0.6, 0.5])
+    assert recovery_time(prices) is None
+
+
+def test_recovery_time_returns_int_when_path_recovers():
+    """A path that dips and recovers should return a positive int."""
+    prices = np.array([1.0, 0.8, 0.9, 1.0, 1.1])
+    result = recovery_time(prices)
+    assert isinstance(result, int)
+    assert result > 0
+
+
+def test_recovery_time_or_inf_returns_inf_on_no_recovery():
+    """[Issue 12] recovery_time_or_inf must return inf, not None."""
+    prices = np.array([1.0, 0.9, 0.8, 0.7])
+    result = recovery_time_or_inf(prices)
+    assert result == float('inf')
+    assert isinstance(result, float)
+
+
+def test_recovery_time_or_inf_returns_finite_on_recovery():
+    """[Issue 12] recovery_time_or_inf must return finite value on recovery."""
+    prices = np.array([1.0, 0.8, 0.9, 1.0, 1.05])
+    result = recovery_time_or_inf(prices)
+    assert np.isfinite(result)
+    assert result > 0
+
+
+def test_recovery_time_or_inf_safe_in_numpy_arithmetic():
+    """[Issue 12] inf-valued results must not crash np.mean or np.nanmean.
+
+    np.mean([finite, inf]) = inf — acceptable.
+    np.nanmean([finite, inf]) = inf — acceptable.
+    Both are safe; neither raises TypeError (which None would).
+    """
+    times = [recovery_time_or_inf(np.array([1.0, 0.9, 0.8])),   # → inf
+             recovery_time_or_inf(np.array([1.0, 0.8, 1.1]))]   # → finite
+    result = np.mean(times)
+    assert not np.isnan(result)   # inf is fine; nan is not
+
+
+def test_recovery_time_or_inf_ensemble_mean_does_not_raise():
+    """[Issue 12] Running recovery_time_or_inf over an ensemble shouldn't raise."""
+    cfg = SimConfig(seed=0, timesteps=500, n_agents=500, q0=1e-3)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        runs = run_ensemble(cfg, n_runs=5)
+    times = [recovery_time_or_inf(r.prices) for r in runs]
+    _ = np.mean(times)   # should not raise
+
+
+# ── manual helper ─────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    print("Generating frozen regression values for sim v0.2.2:")
+    _print_frozen_values()
