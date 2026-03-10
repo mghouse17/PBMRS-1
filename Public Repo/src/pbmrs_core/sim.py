@@ -262,13 +262,22 @@ def compute_field(alpha_r: float, alpha_v: float, alpha_l: float, alpha_0: float
 def update_agents(rng: np.random.Generator, beta: float, J: float,
                    mt: float, ht: float,
                    s: np.ndarray, draws: np.ndarray) -> float:
-    """Eq. 6: P(si=+1) = sigma(beta*(J*mt + ht)). Mutates s, draws in-place."""
+    """Eq. 6: P(si=+1) = sigma(beta*(J*mt + ht)). Returns new mean magnetisation.
+
+    [Perf-13] Two optimisations vs the original np.mean(s) form:
+    1. Replace np.mean over a {+1,-1} float array with integer count arithmetic:
+       mean(s) = (n_on - n_off) / n = (2*n_on - n_agents) / n_agents.
+    2. Skip the s[:] = 1.0 / s[mask] = -1.0 mutation entirely — s is only a
+       pre-allocated buffer; the hot loop only needs the returned mean value.
+       m_arr[0] (before the loop) still uses np.mean(s) at initialisation,
+       so s is read once before the loop begins and then never read again.
+       Savings: ~9µs × 3000 timesteps ≈ 27ms per path.
+    """
     logit = np.clip(beta * (J * mt + ht), -50.0, 50.0)
     p_on  = 1.0 / (1.0 + np.exp(-logit))
     rng.random(out=draws)
-    s[:] = 1.0
-    s[draws >= p_on] = -1.0
-    return float(np.mean(s))
+    n_on = int(np.sum(draws < p_on))
+    return (2 * n_on - len(draws)) / len(draws)
 
 
 # ── _run_sim_with_cache (internal) ─────────────────────────────────────────────
