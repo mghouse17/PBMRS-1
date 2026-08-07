@@ -16,43 +16,85 @@ The framework centers on a discrete-time feedback loop:
 
 Agents → order flow → returns → volatility/liquidity → market field → agents
 
-## Core package
+## Features
 
-The public Python package is available through the `pbmrs_core` module.
+- deterministic simulation core with configurable seeds
+- scenario presets for stress and crash-like conditions
+- diagnostics for drawdown, fragility, regime labels, and tail behavior
+- optional FastAPI service and Streamlit dashboard entry points
+- regression and integration tests covering core behavior
+
+## Requirements
+
+- Python 3.10 or newer
+- pip
 
 ## Installation
 
-From the repository root:
+From the repository root, install the package in editable mode:
 
 ```bash
 python -m pip install -e .
 ```
 
+If you are using the project from a different working directory, point pip at the repository folder explicitly:
+
+```bash
+python -m pip install -e "C:/Users/Mghou/PBMRS-1/Public Repo"
+```
+
 ## Quick start
+
+Run a short simulation from Python:
 
 ```python
 from pbmrs_core import SimConfig, run_sim, max_drawdown
 
 cfg = SimConfig(seed=7, timesteps=200, n_agents=200, q0=0.01)
 out = run_sim(cfg)
-print(out.prices[-1])
-print(max_drawdown(out.prices))
+print(f"Final price: {out.prices[-1]:.4f}")
+print(f"Max drawdown: {max_drawdown(out.prices):.4f}")
 ```
 
-## Project layout
+Run the built-in demo script:
 
-- `src/pbmrs_core/` — simulation core, models, diagnostics, config, scenarios, and API
-- `tests/` — regression and integration tests
-- `configs/` — YAML configuration examples
-- `docs/` — architecture and specification notes
+```bash
+python demo.py
+```
 
-## Verification
+## Running the API and dashboard
 
-Run the test suite with:
+Start the FastAPI service:
+
+```bash
+uvicorn pbmrs_core.api:app --reload
+```
+
+Start the Streamlit dashboard:
+
+```bash
+streamlit run src/pbmrs_core/dashboard.py
+```
+
+## Testing
+
+Run the full test suite:
 
 ```bash
 pytest -q
 ```
+
+## Project layout
+
+- `src/pbmrs_core/` — simulation core, models, diagnostics, config, scenarios, API, dashboard, and visualization
+- `tests/` — regression and integration tests
+- `configs/` — YAML configuration examples
+- `docs/` — architecture and specification notes
+- `demo.py` — minimal runnable example
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## Notes
 
