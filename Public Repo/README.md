@@ -62,6 +62,10 @@ Run the built-in demo script:
 python demo.py
 ```
 
+Explore the simulation interactively in the notebook:
+
+- [PBMRS demo notebook](pbmrs_demo_notebook.ipynb)
+
 ## Running the API and dashboard
 
 Start the FastAPI service:
