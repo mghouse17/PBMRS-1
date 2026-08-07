@@ -1,37 +1,25 @@
 # PBMRS Architecture
 
-## Modules
-### 1) Core State (`pbmrs/core/state.py`)
-Holds x_t, v_t, ℓ_t, and metadata (seed, step, timestamps).
+## Overview
 
-### 2) Agents (`pbmrs/core/agents.py`)
-- Represents agent population
-- Computes magnetization m_t
-- Updates spins using logistic probability
+PBMRS is structured as a modular Python research platform with a clear separation between configuration, mathematical dynamics, diagnostics, and optional interfaces.
 
-### 3) Market (`pbmrs/core/market.py`)
-- Computes Q_t from m_t and liquidity
-- Updates returns and x_{t+1}
-- Updates v_{t+1} and ℓ_{t+1} with constraints
+## Components
 
-### 4) Simulation Orchestrator (`pbmrs/core/sim.py`)
-Single-run loop:
-1) agent update
-2) compute m_t
-3) compute Q_t
-4) compute r_t and x_{t+1}
-5) update v_{t+1}
-6) update ℓ_{t+1}
-7) log outputs
+- `models.py`: typed dataclasses for configs, results, and scenarios
+- `math.py`: isolated equation implementations for order flow, returns, volatility, liquidity, and agent updates
+- `simulation.py`: orchestration of the discrete-time feedback loop
+- `diagnostics.py`: drawdown, recovery, fragility, and tail metrics
+- `scenarios.py`: scenario presets for stress testing
+- `api.py` and `dashboard.py`: optional execution interfaces
 
-### 5) Diagnostics (`pbmrs/diagnostics/*`)
-Drawdown, recovery, fragility regimes, tail risk.
+## Data Flow
 
-## Data Flow (one step)
-Agents → m_t → Q_t → r_t/x → v → ℓ → back into agent field h_i(t)
+Agents → order flow → returns → volatility/liquidity → market field → agents
 
 ## Design Principles
-- Config-driven parameters
-- Deterministic + seeded RNG
-- Separation of core update equations from logging/IO
-- Clear “contracts” for constraints and invariants
+
+- no global state
+- injectable configuration
+- typed public interfaces
+- scientific clarity over marketing claims

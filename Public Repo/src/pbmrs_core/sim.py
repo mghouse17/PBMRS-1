@@ -346,7 +346,7 @@ def _run_sim_with_cache(cfg: SimConfig, cache: _SimCache) -> SimResult:
         v[t+1] = update_volatility(one_minus_kv, kv_target, eta_v, gamma_v,
                                     v[t], rt, mt, min_vol)
         l[t+1] = update_liquidity(one_minus_kl, kl_l0, eta_l, gamma_l,
-                                   l[t], Qt, v[t+1], theta_v, min_liquidity)  # [CQ-6] v[t+1] not v[t]
+                                   l[t], Qt, v[t], theta_v, min_liquidity)
         ht     = compute_field(alpha_r, alpha_v, alpha_l, alpha_0,
                                rt, v[t+1], l[t+1], l0)
         new_m  = update_agents(rng, beta, J, mt, ht, s, draws)
