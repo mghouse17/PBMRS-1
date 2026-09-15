@@ -19,19 +19,20 @@ phase_map   — run a 2-D grid over any two SimConfig parameters,
 from __future__ import annotations
 
 import dataclasses
+import os
 import warnings
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import Any, Dict, List, Optional, Tuple
-import os
+from typing import Any
 
 import numpy as np
 
-from sim import SimConfig, run_ensemble
-from diagnostics import (
-    max_drawdown, recovery_time,
-    acf_squared_returns, magnetization_persistence, tail_stats,
+from .diagnostics import (
+    acf_squared_returns,
+    max_drawdown,
+    recovery_time,
 )
-
+from .models import SimConfig
+from .simulation import run_ensemble
 
 # ── Cell worker (must be top-level for pickling) ──────────────────────────────
 
@@ -45,9 +46,9 @@ def _run_cell(
     iy:          int,
     n_runs:      int,
     seed_offset: int,
-    metrics:     List[str],
+    metrics:     list[str],
     l0:          float,
-) -> Tuple[int, int, Dict[str, float]]:
+) -> tuple[int, int, dict[str, float]]:
     """
     Worker for one (ix, iy) grid cell. Top-level so ProcessPoolExecutor can pickle it.
     Returns (ix, iy, scalar_metrics_dict).
@@ -58,7 +59,7 @@ def _run_cell(
         warnings.simplefilter("ignore")   # suppress supercritical warnings in workers
         results = run_ensemble(cfg, n_runs=n_runs, seeds=seeds)
 
-    cell: Dict[str, float] = {}
+    cell: dict[str, float] = {}
 
     if "mdd_mean" in metrics or "mdd_p95" in metrics:
         mdds = np.array([max_drawdown(r.prices) for r in results])
@@ -104,14 +105,14 @@ def _run_cell(
 def phase_map(
     cfg_base:    SimConfig,
     param_x:     str,
-    values_x:    List[float],
+    values_x:    list[float],
     param_y:     str,
-    values_y:    List[float],
+    values_y:    list[float],
     n_runs:      int = 20,
-    metrics:     Optional[List[str]] = None,
+    metrics:     list[str] | None = None,
     seed_offset: int = 0,
     n_jobs:      int = 1,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Run a 2-D parameter grid and return metric matrices.
 
@@ -211,9 +212,7 @@ def phase_map(
                 )
                 futures[fut] = (ix, iy)
 
-            completed = 0
-            for fut in as_completed(futures):
-                completed += 1
+            for completed, fut in enumerate(as_completed(futures), 1):
                 if completed % max(1, total_cells // 10) == 0:
                     print(f"  {completed}/{total_cells} cells done …",
                           end="\r", flush=True)

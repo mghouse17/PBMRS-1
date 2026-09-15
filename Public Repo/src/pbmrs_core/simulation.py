@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import List, Optional
+from dataclasses import dataclass
 
 import numpy as np
 
@@ -16,7 +16,34 @@ from .math import (
 from .models import SimConfig, SimResult
 
 
-def _run_sim_with_cache(cfg: SimConfig, cache: dict) -> SimResult:
+@dataclass(frozen=True)
+class _SimCache:
+    """Immutable scalars shared across paths in an ensemble."""
+
+    flow_scale: float
+    drift: float
+    sqrt_dt: float
+    one_minus_kv: float
+    kv_target: float
+    one_minus_kl: float
+    kl_l0: float
+    l0_init: float
+
+    @classmethod
+    def from_config(cls, cfg: SimConfig) -> _SimCache:
+        return cls(
+            flow_scale=cfg.q0 * cfg.n_agents,
+            drift=cfg.mu0 * cfg.dt,
+            sqrt_dt=float(np.sqrt(cfg.dt)),
+            one_minus_kv=1.0 - cfg.kappa_v,
+            kv_target=cfg.kappa_v * cfg.theta_v,
+            one_minus_kl=1.0 - cfg.kappa_l,
+            kl_l0=cfg.kappa_l * cfg.l0,
+            l0_init=max(cfg.l0, cfg.min_liquidity),
+        )
+
+
+def _run_sim_with_cache(cfg: SimConfig, cache: _SimCache) -> SimResult:
     rng = np.random.default_rng(cfg.seed)
     T = cfg.timesteps
 
@@ -33,16 +60,16 @@ def _run_sim_with_cache(cfg: SimConfig, cache: dict) -> SimResult:
 
     x[0] = cfg.x0
     v[0] = max(cfg.v0, cfg.min_vol)
-    l[0] = max(cfg.l0, cfg.min_liquidity)
+    l[0] = cache.l0_init
     m_arr[0] = float(np.mean(s))
 
-    flow_scale = cfg.q0 * cfg.n_agents
-    drift = cfg.mu0 * cfg.dt
-    sqrt_dt = float(np.sqrt(cfg.dt))
-    one_minus_kv = 1.0 - cfg.kappa_v
-    kv_target = cfg.kappa_v * cfg.theta_v
-    one_minus_kl = 1.0 - cfg.kappa_l
-    kl_l0 = cfg.kappa_l * cfg.l0
+    flow_scale = cache.flow_scale
+    drift = cache.drift
+    sqrt_dt = cache.sqrt_dt
+    one_minus_kv = cache.one_minus_kv
+    kv_target = cache.kv_target
+    one_minus_kl = cache.one_minus_kl
+    kl_l0 = cache.kl_l0
 
     for t in range(T):
         mt = m_arr[t]
@@ -111,15 +138,16 @@ def _run_sim_with_cache(cfg: SimConfig, cache: dict) -> SimResult:
 
 
 def run_sim(cfg: SimConfig) -> SimResult:
-    return _run_sim_with_cache(cfg, {})
+    return _run_sim_with_cache(cfg, _SimCache.from_config(cfg))
 
 
-def run_ensemble(cfg: SimConfig, n_runs: int, seeds: Optional[List[int]] = None) -> List[SimResult]:
+def run_ensemble(cfg: SimConfig, n_runs: int, seeds: list[int] | None = None) -> list[SimResult]:
     if seeds is None:
         seeds = list(range(n_runs))
     if len(seeds) != n_runs:
         raise ValueError("len(seeds) must equal n_runs")
-    return [_run_sim_with_cache(dataclasses.replace(cfg, seed=s), {}) for s in seeds]
+    cache = _SimCache.from_config(cfg)
+    return [_run_sim_with_cache(dataclasses.replace(cfg, seed=s), cache) for s in seeds]
 
 
 def check_invariants(result: SimResult, cfg: SimConfig) -> None:

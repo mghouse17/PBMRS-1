@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from .models import SimConfig
 from .simulation import run_sim
 
-app = FastAPI(title="PBMRS API", version="0.1.0")
+app = FastAPI(title="PBMRS API", version="0.2.2")
 
 
 class RunRequest(BaseModel):

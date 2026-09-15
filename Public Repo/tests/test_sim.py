@@ -23,13 +23,14 @@ import dataclasses
 import sys
 sys.path.insert(0, '.')
 
-from sim_v2 import (
-    SimConfig, SimResult, _SimCache,
+from pbmrs_core import (
+    SimConfig, SimResult,
     run_sim, run_ensemble, check_invariants,
     compute_flow, compute_return,
     update_volatility, update_liquidity,
     compute_field, update_agents,
 )
+from pbmrs_core.simulation import _SimCache
 
 
 # ══════════════════════════════════════════════════════════════════════════════

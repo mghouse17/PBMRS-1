@@ -21,6 +21,7 @@ Agents → order flow → returns → volatility/liquidity → market field → 
 - deterministic simulation core with configurable seeds
 - scenario presets for stress and crash-like conditions
 - diagnostics for drawdown, fragility, regime labels, and tail behavior
+- auditable FRED/CFTC data access and fixed-grid finite-sample calibration
 - optional FastAPI service and Streamlit dashboard entry points
 - regression and integration tests covering core behavior
 
@@ -36,6 +37,14 @@ From the repository root, install the package in editable mode:
 ```bash
 python -m pip install -e .
 ```
+
+For development and notebook execution:
+
+```bash
+python -m pip install -e ".[dev,notebook]"
+```
+
+The exact environment used for the committed notebook outputs is recorded in requirements-lock.txt.
 
 If you are using the project from a different working directory, point pip at the repository folder explicitly:
 
@@ -62,9 +71,18 @@ Run the built-in demo script:
 python demo.py
 ```
 
-Explore the simulation interactively in the notebook:
+Explore the maintained notebooks:
 
-- [PBMRS demo notebook](pbmrs_demo_notebook.ipynb)
+- [MVP simulation](notebooks/00_pbmrs_mvp.ipynb)
+- [Phase-transition diagnostics](notebooks/01_pbmrs_phase_transition.ipynb)
+- [FRED WTI regime calibration](notebooks/02_wti_regime_calibration.ipynb)
+
+Rebuild the application analysis and notebook with:
+
+```bash
+python notebooks/build_gmsg_analysis.py
+python notebooks/build_gmsg_notebook.py
+```
 
 ## Running the API and dashboard
 

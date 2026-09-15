@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass
-from typing import List, Optional
 
-import numpy as np
+# Mean-field reference used by diagnostics and configuration warnings. It is
+# deliberately a heuristic, not a claimed critical point for the full system.
+NEAR_CRITICAL_MT2_HEURISTIC: float = 0.25
 
 
 @dataclass
@@ -38,7 +39,7 @@ class SimConfig:
     v0: float = 1.0
 
     def __post_init__(self) -> None:
-        errors: List[str] = []
+        errors: list[str] = []
         if self.timesteps <= 0:
             errors.append(f"timesteps must be > 0 (got {self.timesteps})")
         if self.n_agents <= 0:
@@ -65,6 +66,35 @@ class SimConfig:
         flow_scale = self.q0 * self.n_agents
         if not (0.5 <= flow_scale <= 2.0):
             warnings.warn(f"q0 * n_agents = {flow_scale:.3f} is outside [0.5, 2.0]", UserWarning, stacklevel=2)
+
+        approx_rt2 = (self.sigma_eps**2) * self.theta_v
+        eta_v_bound = self.kappa_v / approx_rt2 if approx_rt2 > 0 else float("inf")
+        if self.eta_v > eta_v_bound:
+            warnings.warn(
+                f"eta_v={self.eta_v:.4f} may prevent volatility mean reversion; "
+                f"rough bound is {eta_v_bound:.2f}",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        if self.impact_eps >= self.l0:
+            warnings.warn(
+                "impact_eps is at or above baseline liquidity; the liquidity "
+                "impact channel is effectively floored",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        crowding_elevation = (
+            self.gamma_v * NEAR_CRITICAL_MT2_HEURISTIC / self.kappa_v
+        )
+        if crowding_elevation > 0.5 * self.theta_v:
+            warnings.warn(
+                "near-critical crowding may dominate the volatility state "
+                f"(estimated elevation {crowding_elevation:.2f})",
+                UserWarning,
+                stacklevel=2,
+            )
 
 
 class SimResult(tuple):
