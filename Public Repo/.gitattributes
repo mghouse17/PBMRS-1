@@ -4,3 +4,4 @@ notebooks/data_cache/fred_*.csv binary
 notebooks/data_cache/cftc_*.json binary
 # Derived FX JSON payloads also have exact-byte hashes.
 notebooks/fx_cache/** binary
+notebooks/fx_continuous_cache/** binary

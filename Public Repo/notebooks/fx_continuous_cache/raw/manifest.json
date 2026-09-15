@@ -1,0 +1,23 @@
+{
+  "entries": {
+    "fred_DEXJPUS_2003-01-01_2026-09-15.csv": {
+      "byte_count": 108600,
+      "cache_file": "fred_DEXJPUS_2003-01-01_2026-09-15.csv",
+      "request_parameters": "id=DEXJPUS&cosd=2003-01-01&coed=2026-09-15",
+      "retrieved_at_utc": "2026-09-15T18:11:27.913688+00:00",
+      "sha256": "ea20cdd83243752dd806fa53ed717f703e8c67bc6fd4505f57991a8219f72a1d",
+      "source_name": "fred_DEXJPUS_2003-01-01_2026-09-15.csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DEXJPUS&cosd=2003-01-01&coed=2026-09-15"
+    },
+    "fred_DEXUSEU_2003-01-01_2026-09-15.csv": {
+      "byte_count": 109849,
+      "cache_file": "fred_DEXUSEU_2003-01-01_2026-09-15.csv",
+      "request_parameters": "id=DEXUSEU&cosd=2003-01-01&coed=2026-09-15",
+      "retrieved_at_utc": "2026-09-15T18:11:29.880256+00:00",
+      "sha256": "51851c8ea9cbcc9c262962ae3d3b96c76e2d19bde00460667c99f81ac000d79a",
+      "source_name": "fred_DEXUSEU_2003-01-01_2026-09-15.csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DEXUSEU&cosd=2003-01-01&coed=2026-09-15"
+    }
+  },
+  "schema_version": 1
+}

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+
 from pbmrs_core.fx import (
     discover_definitions,
     fetch_fx,
@@ -148,13 +149,14 @@ def test_fx_notebook_executes_from_clean_kernel_without_upstream_network(tmp_pat
     exhibits = [
         c for c in notebook.cells if "main-exhibit" in c.metadata.get("tags", [])
     ]
-    assert [c.metadata.exhibit for c in exhibits] == list(range(1, 11))
+    assert [c.metadata.exhibit for c in exhibits] == list(range(1, 12))
     assert all(c.outputs for c in exhibits)
     nbformat.write(notebook, tmp_path / "executed_fx.ipynb")
 
 
 def test_fx_raw_hashes_do_not_accept_newline_changes(tmp_path):
     import pytest
+
     from pbmrs_core.commodities import DataFetchError
 
     body = b"DATE,VALUE\n2020-01-01,1\n"

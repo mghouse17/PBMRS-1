@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 
 from pbmrs_core.calibration import load_npz_cache
-from pbmrs_core.fx import fetch_fx
+from pbmrs_core.fx import fetch_fx, validate_raw_tree
 from pbmrs_core.fx_analysis import rolling_inference
 from pbmrs_core.fx_continuous import (
     OUTCOMES,
@@ -22,6 +22,7 @@ from pbmrs_core.fx_continuous import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / "notebooks/fx_cache"
+CONTINUOUS_RAW = ROOT / "notebooks/fx_continuous_cache/raw"
 
 
 def sha256(path: Path) -> str:
@@ -67,7 +68,7 @@ def build():
     for pair in d["sample"]["pairs"]:
         series = fetch_fx(
             pair,
-            cache_dir=CACHE / "raw",
+            cache_dir=CONTINUOUS_RAW,
             start=d["sample"]["start"],
             end=d["sample"]["end"],
         )
@@ -125,7 +126,7 @@ def build():
     ).normal(scale=jpy_series["daily_sd"], size=jpy_series["n_returns"])
     jpy_dates = fetch_fx(
         "JPY",
-        cache_dir=CACHE / "raw",
+        cache_dir=CONTINUOUS_RAW,
         start=d["sample"]["start"],
         end=d["sample"]["end"],
     ).return_dates
@@ -207,6 +208,10 @@ def build():
         "event_design_sha256": event_frozen["design_sha256"],
         "event_results_sha256": sha256(CACHE / "results.json"),
         "simulation_root_key": simulation["root_key"],
+        "raw_hashes": {
+            name: entry["sha256"]
+            for name, entry in validate_raw_tree(CONTINUOUS_RAW).items()
+        },
         "source_sha256": {
             path.relative_to(ROOT).as_posix(): hashlib.sha256(
                 path.read_bytes().replace(b"\r\n", b"\n")

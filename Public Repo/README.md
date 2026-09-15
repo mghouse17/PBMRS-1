@@ -76,7 +76,7 @@ Explore the maintained notebooks:
 - [MVP simulation](notebooks/00_pbmrs_mvp.ipynb)
 - [Phase-transition diagnostics](notebooks/01_pbmrs_phase_transition.ipynb)
 - [FRED WTI regime calibration](notebooks/02_wti_regime_calibration.ipynb)
-- [FX regime calibration and carry-unwind proxy study](notebooks/03_fx_regime_calibration.ipynb)
+- [FX regime calibration, registered event study, and continuous stress test](notebooks/03_fx_regime_calibration.ipynb)
 
 Rebuild the application analysis and notebook with:
 
@@ -97,13 +97,17 @@ Rebuild the FX study from this directory using the installed notebook environmen
 python notebooks/build_fx_data.py
 python notebooks/build_fx_simulations.py --workers 12
 python notebooks/build_fx_results.py
-python notebooks/build_fx_notebook.py
+python notebooks/register_fx_continuous.py
+python notebooks/build_fx_continuous_results.py
+python notebooks/build_fx_notebook_reviewed.py
 jupyter nbconvert --to notebook --execute --inplace notebooks/03_fx_regime_calibration.ipynb
 ```
 
-Only an uncached data build needs network access. Full simulation regeneration is
-computationally intensive; verified committed caches support offline notebook
-execution. Changing a frozen design or simulation inputs fails loudly rather than
+Only an uncached data build needs network access. The original event registration
+and results remain immutable. The continuous test has its own timestamped design
+hash, results manifest, and isolated 2003-2026 FRED cache. Full simulation
+regeneration is computationally intensive; verified committed caches support
+offline notebook execution. Changing a frozen design or simulation inputs fails loudly rather than
 silently reusing results. For a new study, use a separate labelled cache directory.
 The minimum-distance point estimate and discrete non-rejected J set are separate
 objects. Event labels and matching are retrospective; this is not a live trading

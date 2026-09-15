@@ -8,7 +8,6 @@ from pathlib import Path
 
 import numpy as np
 
-
 OUTCOMES = (
     "forward_realized_volatility",
     "forward_max_drawdown",
@@ -51,8 +50,8 @@ def forward_stress_panel(returns, dates, rolling, *, horizon: int = 21):
                 "forward_absolute_terminal_return": float(abs(forward.sum())),
             }
         )
-    if len(panel) < 4:
-        raise ValueError("continuous panel has too few usable rows")
+    if not panel:
+        raise ValueError("continuous panel has no usable rows")
     return panel
 
 
@@ -94,10 +93,22 @@ def block_bootstrap_regression(
     n_blocks = int(np.ceil(n / block_length))
     boot = np.empty(n_resamples)
     offsets = np.arange(block_length)
-    for draw in range(n_resamples):
+    draw = 0
+    invalid_resamples = 0
+    max_attempts = max(100, n_resamples * 10)
+    while draw < n_resamples:
+        if draw + invalid_resamples >= max_attempts:
+            raise RuntimeError("too many rank-deficient bootstrap resamples")
         starts = rng.integers(0, n, size=n_blocks)
         ix = ((starts[:, None] + offsets) % n).ravel()[:n]
-        boot[draw] = _coefficient(rows[ix], values[ix])[1]
+        try:
+            boot[draw] = _coefficient(rows[ix], values[ix])[1]
+        except ValueError as error:
+            if "rank deficient" not in str(error):
+                raise
+            invalid_resamples += 1
+            continue
+        draw += 1
     tail = (1.0 - interval) / 2.0
     lo, hi = np.quantile(boot, [tail, 1.0 - tail])
     return {
@@ -111,6 +122,7 @@ def block_bootstrap_regression(
         "b_hi": float(hi),
         "block_length_steps": block_length,
         "n_resamples": n_resamples,
+        "rank_deficient_resamples_redrawn": invalid_resamples,
         "seed": seed,
     }
 
@@ -160,6 +172,9 @@ def exploratory_event_contrast(
     controls_per_event: int = 5,
     year_band: int = 1,
     max_log_vol_distance: float = 0.50,
+    n_permutation: int = 4999,
+    n_bootstrap: int = 4999,
+    seed: int = 783000,
 ):
     """Post-hoc widened matching; never substitutes for the registered test."""
     from .fx_analysis import pre_event_score
@@ -205,6 +220,7 @@ def exploratory_event_contrast(
         matched.append(
             {
                 **event,
+                "year": str(dates[start])[:4],
                 "score": score,
                 "n_controls": len(controls),
                 "control_positions": [item[1] for item in controls],
@@ -214,7 +230,7 @@ def exploratory_event_contrast(
             }
         )
     differences = [row["difference"] for row in matched]
-    return {
+    result = {
         "status": "post_hoc_exploratory",
         "n_labelled": len(selected),
         "n_matched": len(matched),
@@ -229,7 +245,43 @@ def exploratory_event_contrast(
             "control_policy": "nearest available controls inside caliper",
         },
         "inference": "descriptive only; specified after observing registered sample failure",
+        "lo": None,
+        "hi": None,
+        "p_value": None,
+        "n_permutation": n_permutation,
+        "n_bootstrap": n_bootstrap,
+        "seed": seed,
     }
+    if len(matched) < 3:
+        return result
+    matrix = np.asarray(
+        [[row["score"], *row["control_scores"]] for row in matched], dtype=float
+    )
+    rng = np.random.default_rng(seed)
+    choices = rng.integers(matrix.shape[1], size=(n_permutation, len(matrix)))
+    chosen = matrix[np.arange(len(matrix))[None, :], choices]
+    null = (
+        chosen - (matrix.sum(axis=1)[None, :] - chosen) / (matrix.shape[1] - 1)
+    ).mean(axis=1)
+    effect = result["effect_descriptive"]
+    result["p_value"] = float((1 + np.count_nonzero(null >= effect)) / (1 + len(null)))
+    differences = np.asarray(differences)
+    years = sorted({row["year"] for row in matched})
+    clusters = [differences[[row["year"] == year for row in matched]] for year in years]
+    boot = np.asarray(
+        [
+            np.concatenate(
+                [clusters[i] for i in rng.integers(len(clusters), size=len(clusters))]
+            ).mean()
+            for _ in range(n_bootstrap)
+        ]
+    )
+    result["lo"], result["hi"] = [float(value) for value in np.percentile(boot, [2.5, 97.5])]
+    result["inference"] = (
+        "post-hoc one-sided matched-label permutation p-value and year-cluster "
+        "bootstrap interval; no pre-registered interpretation"
+    )
+    return result
 
 
 def load_continuous_study(root):
@@ -253,6 +305,17 @@ def load_continuous_study(root):
         raise ValueError("continuous registration/computation timestamps are invalid")
     if hashlib.sha256(body).hexdigest() != manifest["results_sha256"]:
         raise ValueError("continuous result payload hash mismatch")
+    for relative, expected in manifest["source_sha256"].items():
+        actual = hashlib.sha256(
+            (root / relative).read_bytes().replace(b"\r\n", b"\n")
+        ).hexdigest()
+        if actual != expected:
+            raise ValueError(f"continuous source changed: {relative}")
+    from .fx import validate_raw_tree
+
+    raw = validate_raw_tree(root / "notebooks/fx_continuous_cache/raw")
+    if {name: entry["sha256"] for name, entry in raw.items()} != manifest["raw_hashes"]:
+        raise ValueError("continuous raw input hashes changed")
     event_registration = json.loads((cache / "preregistration.json").read_text())
     event_results = (cache / "results.json").read_bytes()
     if event_registration["design_sha256"] != manifest["event_design_sha256"]:

@@ -1,0 +1,19 @@
+{
+  "design_sha256": "70f651031e9d5891791977568a56cb630c7c4a4dd615b2ed29ad3503e79c92e7",
+  "registered_at_utc": "2026-09-15T17:25:05.665252+00:00",
+  "started_at_utc": "2026-09-15T20:48:00.752234+00:00",
+  "computed_at_utc": "2026-09-15T20:48:11.002268+00:00",
+  "results_sha256": "d34baf4732cf25c525a0774866d8979b37f90bd9476eab5bdc8ea2c3393d0d72",
+  "event_design_sha256": "d5bd9607cbae2c0f1bfa7b027c9d0efb8d6fcb900db8be5ae00998ca9498637b",
+  "event_results_sha256": "446f7376a7a7395c3770c468c10dd25164315814193d8ae21bd9a6647744dc2d",
+  "simulation_root_key": "a08a29d5868fcb8c92aa75081c248cb561c168eb89456b226ad3faa86fae0e17",
+  "raw_hashes": {
+    "fred_DEXJPUS_2003-01-01_2026-09-15.csv": "ea20cdd83243752dd806fa53ed717f703e8c67bc6fd4505f57991a8219f72a1d",
+    "fred_DEXUSEU_2003-01-01_2026-09-15.csv": "51851c8ea9cbcc9c262962ae3d3b96c76e2d19bde00460667c99f81ac000d79a"
+  },
+  "source_sha256": {
+    "configs/fx_continuous_test.json": "70f651031e9d5891791977568a56cb630c7c4a4dd615b2ed29ad3503e79c92e7",
+    "src/pbmrs_core/fx_continuous.py": "199f5e6ee4c207fbf700d85447607e5143071d18b5ce75d42e97c4056a80bc73",
+    "notebooks/build_fx_continuous_results.py": "d12793c9f673ab428dc4f0a6eb9c09fdd1485028d14d6bcf665252314b832384"
+  }
+}

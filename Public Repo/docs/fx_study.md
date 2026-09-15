@@ -13,6 +13,16 @@ steps, 21 prior sessions per event score, one-sided alpha 0.10, evaluation from
 are secondary. Every specification and excluded event appears in results.json.
 This is a local timestamped declaration, not an independently registered protocol.
 
+The registered event study produced five held-out JPY labels but only two matched
+episodes, so its test did not execute. Its design, registration and `results.json`
+remain unchanged. A separately frozen continuous design uses 500-session rolling
+minimum-distance estimates, 21-session steps, and the full 2003-2026 sample. It
+regresses next-21-session stress on J_hat and `log(current realized volatility)`;
+the volatility control is required because otherwise the association would merely
+restate volatility clustering. The primary outcome is forward realized volatility;
+maximum drawdown and absolute terminal return are secondary. Inference uses 4,999
+circular moving-block pairs resamples with a 24-step block.
+
 ## Data and quote convention
 
 FRED DEXJPUS is JPY per USD and is inverted. DEXUSEU is already USD per EUR.
@@ -95,6 +105,28 @@ COT labels refer to Tuesday observations generally released on Friday, with holi
 delays. Because matching is retrospective and data are a current vintage, this is
 not an implementable live trading strategy or a historical release-vintage backtest.
 
+The detector independently identifies the deck's 28 July-4 August 2026 intervention
+window, with prior net short exposure 0.2359, a 0.0909 reduction and appreciation
+z=3.44. The registered matcher excludes it for insufficient controls. The notebook
+surfaces this beside GMSG's "market caught offside" discussion while distinguishing
+the fragile setup from the external policy trigger, which PBMRS does not model.
+
+A post-hoc descriptive arm widens the pool to plus/minus one calendar year, retains
+prior 250-session volatility, and chooses up to five nearest controls inside a 0.50
+log-volatility caliper. It matches all five episodes. Its interval and permutation
+p-value are explicitly exploratory and cannot replace the registered result.
+
+## Continuous result
+
+The continuous design was timestamped and hashed before coefficient estimation.
+JPY, EUR and a JPY-SD-matched independent Gaussian series each yield 259 stepped
+estimates. The primary JPY slope is 0.000806 with a 95% block-bootstrap interval
+[-0.001393, 0.003311]. The interval includes zero: at this scale the statistic adds
+no statistically resolved information beyond volatility clustering. EUR and
+Gaussian primary intervals also include zero, as do every secondary-outcome
+interval. Wide intervals are expected because the overlapping predictor windows
+represent only about twelve independent 500-session spans.
+
 ## Reproduction and limitations
 
 The raw, simulation and result payloads have byte hashes. Source hashes normalize
@@ -107,9 +139,16 @@ discovery-only artifacts and are ignored. Their original retrieval hashes remain
 the historical manifest and cache key. Offline discovery uses the compact CFTC views
 snapshot; parsing each cached positioning payload validates the required fields.
 
+Continuous FRED files live under `notebooks/fx_continuous_cache/raw`, separate from
+the registered event-study cache. This prevents the longer 2003 history from
+changing the event study's exact raw-input hash set. The continuous manifest checks
+its design, sources, exact raw bytes, original event-design/result dependencies,
+and output bytes.
+
 The historical scale/flow-share opening table is explicitly attributed to the user
 brief, which supplied no underlying paths/seeds. It is not presented as a fresh
 verified run. Every FX finding is newly computed. Gaussian tails, omitted policy
 and peg-break shocks, daily-step assumptions, finite-grid limits, weak carry labels,
 and exclusion of tail behavior from the selected statistic remain explicit.
-The missing GMSG FX report limits claim-specific framing, not the empirical build.
+The GMSG FX report is now used for claim-specific framing. Its intervention account
+is not treated as a model mechanism or a uniquely translated PBMRS hypothesis.
