@@ -1,3 +1,4 @@
+LICENSE
 README.md
 pyproject.toml
 src/pbmrs.egg-info/PKG-INFO
@@ -12,6 +13,8 @@ src/pbmrs_core/agents.py
 src/pbmrs_core/analysis.py
 src/pbmrs_core/api.py
 src/pbmrs_core/app.py
+src/pbmrs_core/calibration.py
+src/pbmrs_core/commodities.py
 src/pbmrs_core/config.py
 src/pbmrs_core/dashboard.py
 src/pbmrs_core/diagnostics.py
@@ -21,5 +24,9 @@ src/pbmrs_core/scenarios.py
 src/pbmrs_core/sim.py
 src/pbmrs_core/simulation.py
 src/pbmrs_core/visualization.py
+tests/test_calibration.py
+tests/test_commodities.py
+tests/test_consolidation.py
+tests/test_new_issues.py
 tests/test_package.py
 tests/test_sim.py

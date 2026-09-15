@@ -1,18 +1,27 @@
 Metadata-Version: 2.4
 Name: pbmrs
-Version: 0.1.0
+Version: 0.2.2
 Summary: Physics-Based Market Risk Simulator
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
+License-File: LICENSE
 Requires-Dist: numpy>=1.24
 Requires-Dist: pydantic>=2.0
 Requires-Dist: pyyaml>=6.0
-Requires-Dist: pytest>=8.0
+Requires-Dist: tzdata>=2025.2
 Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
 Requires-Dist: black; extra == "dev"
 Requires-Dist: ruff; extra == "dev"
 Requires-Dist: mypy; extra == "dev"
 Requires-Dist: pre-commit; extra == "dev"
+Provides-Extra: notebook
+Requires-Dist: pandas>=3.0; extra == "notebook"
+Requires-Dist: matplotlib>=3.11; extra == "notebook"
+Requires-Dist: jupyter>=1.1; extra == "notebook"
+Requires-Dist: nbconvert>=7.16; extra == "notebook"
+Requires-Dist: ipykernel>=7.0; extra == "notebook"
+Dynamic: license-file
 
 # PBMRS: Physics-Based Market Risk Simulator
 
@@ -32,43 +41,89 @@ The framework centers on a discrete-time feedback loop:
 
 Agents → order flow → returns → volatility/liquidity → market field → agents
 
-## Core package
+## Features
 
-The public Python package is available through the `pbmrs_core` module.
+- deterministic simulation core with configurable seeds
+- scenario presets for stress and crash-like conditions
+- diagnostics for drawdown, fragility, regime labels, and tail behavior
+- optional FastAPI service and Streamlit dashboard entry points
+- regression and integration tests covering core behavior
+
+## Requirements
+
+- Python 3.10 or newer
+- pip
 
 ## Installation
 
-From the repository root:
+From the repository root, install the package in editable mode:
 
 ```bash
 python -m pip install -e .
 ```
 
+If you are using the project from a different working directory, point pip at the repository folder explicitly:
+
+```bash
+python -m pip install -e "C:/Users/Mghou/PBMRS-1/Public Repo"
+```
+
 ## Quick start
+
+Run a short simulation from Python:
 
 ```python
 from pbmrs_core import SimConfig, run_sim, max_drawdown
 
 cfg = SimConfig(seed=7, timesteps=200, n_agents=200, q0=0.01)
 out = run_sim(cfg)
-print(out.prices[-1])
-print(max_drawdown(out.prices))
+print(f"Final price: {out.prices[-1]:.4f}")
+print(f"Max drawdown: {max_drawdown(out.prices):.4f}")
 ```
 
-## Project layout
+Run the built-in demo script:
 
-- `src/pbmrs_core/` — simulation core, models, diagnostics, config, scenarios, and API
-- `tests/` — regression and integration tests
-- `configs/` — YAML configuration examples
-- `docs/` — architecture and specification notes
+```bash
+python demo.py
+```
 
-## Verification
+Explore the simulation interactively in the notebook:
 
-Run the test suite with:
+- [PBMRS demo notebook](pbmrs_demo_notebook.ipynb)
+
+## Running the API and dashboard
+
+Start the FastAPI service:
+
+```bash
+uvicorn pbmrs_core.api:app --reload
+```
+
+Start the Streamlit dashboard:
+
+```bash
+streamlit run src/pbmrs_core/dashboard.py
+```
+
+## Testing
+
+Run the full test suite:
 
 ```bash
 pytest -q
 ```
+
+## Project layout
+
+- `src/pbmrs_core/` — simulation core, models, diagnostics, config, scenarios, API, dashboard, and visualization
+- `tests/` — regression and integration tests
+- `configs/` — YAML configuration examples
+- `docs/` — architecture and specification notes
+- `demo.py` — minimal runnable example
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## Notes
 

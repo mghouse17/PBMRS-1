@@ -1,8 +1,7 @@
 """
 test_new_issues.py — Additional tests for Issues 9, 10, 11, 12
 
-These tests supplement test_sim.py. Add them to your test suite.
-They assume the CQ-fixed sim.py (v0.2.2) is on the path as 'sim'.
+These tests supplement test_sim.py and exercise the canonical package API.
 
 Run with:
     pytest test_new_issues.py -v
@@ -15,7 +14,7 @@ import dataclasses
 import sys
 sys.path.insert(0, '.')
 
-from sim import (
+from pbmrs_core import (
     SimConfig, run_sim, run_ensemble, check_invariants,
     NEAR_CRITICAL_MT2_HEURISTIC,
 )
@@ -60,7 +59,7 @@ def recovery_time_or_inf(prices, epsilon=0.0):
 
 N_RUNS_REGIME = 15    # enough to be stable, fast enough for CI
 T_REGIME      = 800
-# alpha_r=12.0 is required for regime separation (calibration fix v2.2)
+# alpha_r=12.0 is required for regime separation (calibration fix v0.2.2)
 ALPHA_R_CALIBRATED = 12.0
 
 
@@ -138,7 +137,7 @@ def test_regime_invariants_hold_for_all(regime_ensembles):
 # ══════════════════════════════════════════════════════════════════════════════
 
 # Frozen from: SimConfig(seed=42, timesteps=200, n_agents=200, q0=0.005)
-# Sim version: 0.2.2 (CQ-6: v[t+1] in liquidity update)
+# Sim version: 0.2.2 (liquidity uses the specification's v[t] state)
 # To update intentionally: run the print block below, paste new values,
 # and commit with message: "update FROZEN for sim v<new version>"
 
@@ -147,13 +146,13 @@ SIM_VERSION = "0.2.2"
 FROZEN = {
     "sim_version": SIM_VERSION,   # [Issue 10] version-linked regression dict
     # Values computed with SimConfig(seed=42, timesteps=200, n_agents=200, q0=0.005, alpha_r=12.0)
-    # Updated for: CQ-6 (v[t+1] in liquidity), alpha_r calibration fix (1.0→12.0)
-    "x_final":    -0.40849919,
-    "v_mean":      1.01879219,
-    "l_min":       0.91563630,
+    # Updated for the alpha_r calibration fix (1.0 to 12.0).
+    "x_final":    -0.40853468,
+    "v_mean":      1.01879198,
+    "l_min":       0.91590709,
     "m_max":       0.37000000,
-    "r_std":       0.01215365,
-    "prices_min":  0.65269710,
+    "r_std":       0.01215310,
+    "prices_min":  0.65267590,
 }
 
 REGRESSION_CFG = SimConfig(seed=42, timesteps=200, n_agents=200, q0=0.005, alpha_r=12.0)

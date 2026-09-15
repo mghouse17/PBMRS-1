@@ -1,4 +1,15 @@
+"""Compatibility wrapper for historical root-level imports."""
+
+import warnings
+
+warnings.warn(
+    "sim_v2 is deprecated; import simulator APIs from pbmrs_core",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
 from pbmrs_core import (
+    NEAR_CRITICAL_MT2_HEURISTIC,
     SimConfig,
     SimResult,
     check_invariants,
@@ -11,15 +22,12 @@ from pbmrs_core import (
     update_liquidity,
     update_volatility,
 )
-
-
-class _SimCache:
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
+from pbmrs_core.simulation import _SimCache
 
 
 __all__ = [
     "SimConfig",
+    "NEAR_CRITICAL_MT2_HEURISTIC",
     "SimResult",
     "_SimCache",
     "run_sim",

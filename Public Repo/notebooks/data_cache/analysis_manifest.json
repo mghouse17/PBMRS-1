@@ -1,0 +1,71 @@
+{
+  "cache_keys": {
+    "gmsg_controls.npz": "398553c48031b113a30671e95d025d3a2a0a5a8b152180bc88cb3bde9f0acc93",
+    "gmsg_horizon.npz": "d87bbe8a5a5f09f8c0a9ae17076f1f8f4f500c83a64c117f68647034f2c6a15b",
+    "gmsg_marginals.npz": "9e053f2a215466407ce5efb2e1e2128d2f573d37d064f8b1de1b36fc6d6262c4",
+    "gmsg_power.npz": "430de7e32bb71c71eb998aa6747b8f59aa00f99f4438e09be144d84da8196f03",
+    "gmsg_profiles.npz": "590796b5afd157834af66f6c0d948bc23c882977be380ee11e7eb593839cbbe3",
+    "gmsg_stability.npz": "778ec1941983ff3e2c23a8db9db243a018a839507183044ed246ce8d683f4023"
+  },
+  "code_hash": "06ed76c69f72c612b2f42fed04e2803136456a8dc2443eb38fd8b3929328ce99",
+  "schema_version": 1,
+  "seed_ledger": {
+    "adequacy_calibration": [
+      0,
+      999
+    ],
+    "adequacy_null": [
+      1000,
+      5998
+    ],
+    "controls": "254000 and 257800 series",
+    "horizon": "404000 and 407800 series",
+    "marginals": "500000-series, disjoint by J and T",
+    "power": "100000-series, disjoint by T",
+    "stability": [
+      50000,
+      50499
+    ]
+  },
+  "settings": {
+    "J_grid": [
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.78,
+      0.8,
+      0.82,
+      0.8333333333333334,
+      0.85
+    ],
+    "alpha": 0.1,
+    "burn": 500,
+    "n_calibration": 1000,
+    "n_null": 4999,
+    "n_pseudo": 500,
+    "n_stability": 500,
+    "nlags": 8,
+    "positions": 144,
+    "power_lengths": [
+      144,
+      250,
+      500,
+      1000,
+      2000
+    ],
+    "sigma_eps_grid": [
+      0.01,
+      0.015,
+      0.02,
+      0.03,
+      0.037
+    ]
+  }
+}

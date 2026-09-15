@@ -1,0 +1,59 @@
+{
+  "entries": {
+    "cftc_6dca-aqww_2026-01-01_2026-07-31.json": {
+      "byte_count": 4921,
+      "cache_file": "cftc_6dca-aqww_2026-01-01_2026-07-31.json",
+      "request_parameters": "%24select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27067651%27+AND+report_date_as_yyyy_mm_dd+between+%272026-01-01T00%3A00%3A00.000%27+and+%272026-07-31T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=5000",
+      "retrieved_at_utc": "2026-09-14T20:45:21.066799+00:00",
+      "sha256": "0ccbd7f9862345de238a4335dd36610df9edf6559dd3584aeb2cbab84d6eb5f7",
+      "source_name": "cftc_6dca-aqww_2026-01-01_2026-07-31.json",
+      "url": "https://publicreporting.cftc.gov/resource/6dca-aqww.json?%24select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27067651%27+AND+report_date_as_yyyy_mm_dd+between+%272026-01-01T00%3A00%3A00.000%27+and+%272026-07-31T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=5000"
+    },
+    "cftc_72hh-3qpy_2026-01-01_2026-07-31.json": {
+      "byte_count": 4918,
+      "cache_file": "cftc_72hh-3qpy_2026-01-01_2026-07-31.json",
+      "request_parameters": "%24select=report_date_as_yyyy_mm_dd%2Cm_money_positions_long_all%2Cm_money_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27067651%27+AND+report_date_as_yyyy_mm_dd+between+%272026-01-01T00%3A00%3A00.000%27+and+%272026-07-31T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=5000",
+      "retrieved_at_utc": "2026-09-14T20:45:19.940220+00:00",
+      "sha256": "4ce190e967ecbd47bed22cf59a8ba2b926afe756592ff594f1c87c87b5ce1a29",
+      "source_name": "cftc_72hh-3qpy_2026-01-01_2026-07-31.json",
+      "url": "https://publicreporting.cftc.gov/resource/72hh-3qpy.json?%24select=report_date_as_yyyy_mm_dd%2Cm_money_positions_long_all%2Cm_money_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27067651%27+AND+report_date_as_yyyy_mm_dd+between+%272026-01-01T00%3A00%3A00.000%27+and+%272026-07-31T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=5000"
+    },
+    "cftc_jun7-fc8e_2026-01-01_2026-07-31.json": {
+      "byte_count": 4921,
+      "cache_file": "cftc_jun7-fc8e_2026-01-01_2026-07-31.json",
+      "request_parameters": "%24select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27067651%27+AND+report_date_as_yyyy_mm_dd+between+%272026-01-01T00%3A00%3A00.000%27+and+%272026-07-31T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=5000",
+      "retrieved_at_utc": "2026-09-14T20:45:20.420518+00:00",
+      "sha256": "ddb4a3d33fa103e6d177d44c9d952f22fd31a5cba78ffa93096dba6a1c4b8f66",
+      "source_name": "cftc_jun7-fc8e_2026-01-01_2026-07-31.json",
+      "url": "https://publicreporting.cftc.gov/resource/jun7-fc8e.json?%24select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27067651%27+AND+report_date_as_yyyy_mm_dd+between+%272026-01-01T00%3A00%3A00.000%27+and+%272026-07-31T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=5000"
+    },
+    "cftc_kh3c-gbw2_2026-01-01_2026-07-31.json": {
+      "byte_count": 4901,
+      "cache_file": "cftc_kh3c-gbw2_2026-01-01_2026-07-31.json",
+      "request_parameters": "%24select=report_date_as_yyyy_mm_dd%2Cm_money_positions_long_all%2Cm_money_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27067651%27+AND+report_date_as_yyyy_mm_dd+between+%272026-01-01T00%3A00%3A00.000%27+and+%272026-07-31T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=5000",
+      "retrieved_at_utc": "2026-09-14T20:45:19.489833+00:00",
+      "sha256": "da21974bff110002cc1aeb780e3e8152c3c57dcb6c38d0ce686e34b0b66b7fca",
+      "source_name": "cftc_kh3c-gbw2_2026-01-01_2026-07-31.json",
+      "url": "https://publicreporting.cftc.gov/resource/kh3c-gbw2.json?%24select=report_date_as_yyyy_mm_dd%2Cm_money_positions_long_all%2Cm_money_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27067651%27+AND+report_date_as_yyyy_mm_dd+between+%272026-01-01T00%3A00%3A00.000%27+and+%272026-07-31T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=5000"
+    },
+    "fred_DCOILBRENTEU_2026-01-01_2026-07-31.csv": {
+      "byte_count": 2629,
+      "cache_file": "fred_DCOILBRENTEU_2026-01-01_2026-07-31.csv",
+      "request_parameters": "id=DCOILBRENTEU&cosd=2026-01-01&coed=2026-07-31",
+      "retrieved_at_utc": "2026-09-14T20:45:18.913264+00:00",
+      "sha256": "85dad56491c41fe902ce16cc332d5b8b60ca29f1d97ccd05271d43200a8c54e7",
+      "source_name": "fred_DCOILBRENTEU_2026-01-01_2026-07-31.csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU&cosd=2026-01-01&coed=2026-07-31"
+    },
+    "fred_DCOILWTICO_2026-01-01_2026-07-31.csv": {
+      "byte_count": 2589,
+      "cache_file": "fred_DCOILWTICO_2026-01-01_2026-07-31.csv",
+      "request_parameters": "id=DCOILWTICO&cosd=2026-01-01&coed=2026-07-31",
+      "retrieved_at_utc": "2026-09-14T20:45:18.552479+00:00",
+      "sha256": "6bc68e8cbce3351dc5515e4f36a7d9f665e95c34967188952cde04700b565eba",
+      "source_name": "fred_DCOILWTICO_2026-01-01_2026-07-31.csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO&cosd=2026-01-01&coed=2026-07-31"
+    }
+  },
+  "schema_version": 1
+}

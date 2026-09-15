@@ -1,12 +1,12 @@
-# PBMRS Base Configuration — v2.2 (calibration fix)
+# PBMRS Base Configuration - v0.2.2
 # A simulation run is fully determined by (config + seed + code version).
 #
-# CALIBRATION NOTE (v2.2):
+# CALIBRATION NOTE (v0.2.2):
 #   alpha_r raised from 1.0 to 12.0. This is the critical fix for regime separation.
 #   With alpha_r=1.0, the feedback loop was 9x weaker than the noise floor (SNR~0.11).
 #   At alpha_r=12.0, the feedback SNR rises to ~1.3, enabling meaningful vol clustering,
 #   MDD scaling, and herding fraction separation across J regimes.
-#   All other parameters unchanged from v2.0.
+#   All other parameters unchanged from v0.2.0.
 
 # ── Reproducibility ───────────────────────────────────────────────────────────
 seed:      42
@@ -18,10 +18,10 @@ n_agents: 2000
 q0: 0.0005   # q0*N = 1.0, so Qt = mt ∈ [-1,1] at full herding
 
 beta: 1.2
-J:    0.5    # J*beta = 0.60 (subcritical). Critical boundary: J < 1/beta = 0.833.
+J:    0.5    # J*beta = 0.60. Agent-layer reference: J = 1/beta = 0.833.
 
 # ── Market field weights (Eq. 5) ─────────────────────────────────────────────
-alpha_r: 12.0   # trend-following weight — CALIBRATED from 1.0 (v2.2)
+alpha_r: 12.0   # trend-following weight — CALIBRATED from 1.0 (v0.2.2)
                 # SNR analysis: alpha_r must satisfy alpha_r*sigma_eps*beta >> 1/sqrt(N)
                 # for feedback to overcome finite-size noise at N=2000.
 alpha_v: 0.001  # volatility-aversion weight
@@ -57,7 +57,7 @@ x0: 0.0
 v0: 1.0    # warm start at theta_v
 
 # ── Notebook demo J values (use with alpha_r=12.0) ───────────────────────────
-# Subcritical:  J=0.40  (J*beta=0.48)  — baseline stable regime
-# Near-critical: J=0.65 (J*beta=0.78)  — emerging instability
-# Critical:      J=0.78 (J*beta=0.94)  — near phase transition
-# Supercritical: J=0.90 (J*beta=1.08)  — full herding (use with care: v may explode)
+# Low coupling:        J=0.40  (J*beta=0.48) - baseline stable regime
+# Elevated coupling:   J=0.65  (J*beta=0.78) - emerging instability
+# Tail comparison:     J=0.78  (J*beta=0.94) - stability-screened point
+# Above the reference: J=0.90  (J*beta=1.08) - use with care: v may explode
