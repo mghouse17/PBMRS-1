@@ -1,0 +1,640 @@
+{
+  "code_hash": "c491fd76dc87e7ba7a3c1bd13a8a027582b54d007873671de11119474a040d4f",
+  "design_sha256": "d5bd9607cbae2c0f1bfa7b027c9d0efb8d6fcb900db8be5ae00998ca9498637b",
+  "config": {
+    "seed": 42,
+    "timesteps": 2000,
+    "dt": 1.0,
+    "n_agents": 2000,
+    "q0": 0.0005,
+    "beta": 1.2,
+    "J": 0.5,
+    "alpha_r": 12.0,
+    "alpha_v": 0.001,
+    "alpha_l": 0.1,
+    "alpha_0": 0.0,
+    "mu0": 0.0,
+    "lam": 0.05,
+    "sigma_eps": 0.01,
+    "kappa_v": 0.05,
+    "theta_v": 1.0,
+    "eta_v": 0.85,
+    "gamma_v": 0.05,
+    "kappa_l": 0.03,
+    "l0": 1.0,
+    "eta_l": 0.015,
+    "gamma_l": 0.03,
+    "impact_eps": 0.01,
+    "min_vol": 0.0,
+    "min_liquidity": 1e-06,
+    "x0": 0.0,
+    "v0": 1.0
+  },
+  "raw_hashes": {
+    "EUR_099741/cftc_6dca-aqww_2010-01-01_2026-09-15.json": "cb321d6aefe6de43ba226ee375d3e474aa62bf1cfc362ad88910362e0a592bb8",
+    "EUR_099741/cftc_gpe5-46if_2010-01-01_2026-09-15.json": "8b900601e19a8eeda707231c41c7a317a5b8945c31022ad632696ccf658b4259",
+    "EUR_099741/cftc_jun7-fc8e_2010-01-01_2026-09-15.json": "e839a9fe7855fb972530941c3f6fe93b5c009de4da1beb82ca17a675f956e918",
+    "EUR_099741/cftc_yw9f-hn96_2010-01-01_2026-09-15.json": "8360857344fc02836ea70b3fda5e79c246d15da3570b7db4a74904b1d56adf53",
+    "JPY_097741/cftc_6dca-aqww_2010-01-01_2026-09-15.json": "b1a8134687a144f1988c0907f06f8ed25bab4cc678d1f63c5b77fc7bd6989444",
+    "JPY_097741/cftc_gpe5-46if_2010-01-01_2026-09-15.json": "e74ea7b330f7702484afce2032e72dddec71166ddc0bea67bee9811a8c3c9c98",
+    "JPY_097741/cftc_jun7-fc8e_2010-01-01_2026-09-15.json": "2f7b9c831a0154292ffb5f358fca0235e78d8c91a558ffb9da0a2908754312e4",
+    "JPY_097741/cftc_yw9f-hn96_2010-01-01_2026-09-15.json": "474dc6d730bcff8bb2c54f8793fa6a33ed0b1cda3ac368ee4e5772e8f5732acd",
+    "cftc_catalog.json": "d5184acae98546b25335c1fd6c5a2562a34aeba56a52387601faa572e763859a",
+    "cftc_contract_legacy_combined_EUR.json": "5b7a80f5392d5765225a2932bc36b29bf34f4a3c414532c99ea3d8961a2e924f",
+    "cftc_contract_legacy_combined_JPY.json": "5ce91789f5a04919d3d9914688e6d95c3abfa8dad415366414a8497472879f46",
+    "cftc_contract_legacy_futures_EUR.json": "5b7a80f5392d5765225a2932bc36b29bf34f4a3c414532c99ea3d8961a2e924f",
+    "cftc_contract_legacy_futures_JPY.json": "5ce91789f5a04919d3d9914688e6d95c3abfa8dad415366414a8497472879f46",
+    "cftc_contract_tff_combined_EUR.json": "5b7a80f5392d5765225a2932bc36b29bf34f4a3c414532c99ea3d8961a2e924f",
+    "cftc_contract_tff_combined_JPY.json": "5ce91789f5a04919d3d9914688e6d95c3abfa8dad415366414a8497472879f46",
+    "cftc_contract_tff_futures_EUR.json": "5b7a80f5392d5765225a2932bc36b29bf34f4a3c414532c99ea3d8961a2e924f",
+    "cftc_contract_tff_futures_JPY.json": "5ce91789f5a04919d3d9914688e6d95c3abfa8dad415366414a8497472879f46",
+    "cftc_metadata_6dca-aqww.json": "4653a6650831670a1cd18cb1aea0892cdca0f5ededbe3aa65059b15b894fb8da",
+    "cftc_metadata_gpe5-46if.json": "dc3424ac6d79e5fe4e9bef8ac8b80dd0fc6c2958c45edc5c990f83b2e6690392",
+    "cftc_metadata_jun7-fc8e.json": "e53d476a98d9e822351e1e45dd59eea1f8027d106a0219627c1a31807d80e73f",
+    "cftc_metadata_yw9f-hn96.json": "f1c12e04177c289350e5000216c4a6b89276d56903aa4deb7994d2ae60e9d661",
+    "cftc_views.json": "fca0f87641c3caf155dea80e4947b315b2c8ea87ee3f793040cd8d6a918712ac",
+    "fred_DEXJPUS_2010-01-01_2026-09-15.csv": "fadd8944919b929e90a6595181ffaad57064b098f633d1e8e98f9e99aa2853a6",
+    "fred_DEXUSEU_2010-01-01_2026-09-15.csv": "952f88a249e25d2669d027eb8af0aafda16301839d3ccbd7790ee7d83d00b5f7"
+  },
+  "root_key": "a08a29d5868fcb8c92aa75081c248cb561c168eb89456b226ad3faa86fae0e17",
+  "started_at_utc": "2026-09-15T15:44:34.351049+00:00",
+  "scale": {
+    "JPY": {
+      "sigma_eps": 0.005455585937499998,
+      "target_sd": 0.006183047852318004,
+      "matched_sd": 0.006194714223892475,
+      "relative_error": 0.0018868318429878794,
+      "trace": [
+        {
+          "sigma_eps": 1e-05,
+          "total_sd": 0.0014199563015074438
+        },
+        {
+          "sigma_eps": 0.015,
+          "total_sd": 0.01696541697700903
+        },
+        {
+          "sigma_eps": 0.0075049999999999995,
+          "total_sd": 0.008439443164983048
+        },
+        {
+          "sigma_eps": 0.0037574999999999996,
+          "total_sd": 0.004381195140579317
+        },
+        {
+          "sigma_eps": 0.005631249999999999,
+          "total_sd": 0.006385002236761399
+        },
+        {
+          "sigma_eps": 0.004694374999999999,
+          "total_sd": 0.0053741654840435225
+        },
+        {
+          "sigma_eps": 0.005162812499999999,
+          "total_sd": 0.005878035787125099
+        },
+        {
+          "sigma_eps": 0.005397031249999999,
+          "total_sd": 0.006131342924291655
+        },
+        {
+          "sigma_eps": 0.005514140624999999,
+          "total_sd": 0.006258307962096971
+        },
+        {
+          "sigma_eps": 0.005455585937499998,
+          "total_sd": 0.006194714223892475
+        }
+      ],
+      "training_n": 2003,
+      "training_end": "2017-12-29",
+      "reference_J": 0.4
+    },
+    "EUR": {
+      "sigma_eps": 0.005162812499999999,
+      "target_sd": 0.005907417636538138,
+      "matched_sd": 0.005878035787125099,
+      "relative_error": 0.004973721382302232,
+      "trace": [
+        {
+          "sigma_eps": 1e-05,
+          "total_sd": 0.0014199563015074438
+        },
+        {
+          "sigma_eps": 0.015,
+          "total_sd": 0.01696541697700903
+        },
+        {
+          "sigma_eps": 0.0075049999999999995,
+          "total_sd": 0.008439443164983048
+        },
+        {
+          "sigma_eps": 0.0037574999999999996,
+          "total_sd": 0.004381195140579317
+        },
+        {
+          "sigma_eps": 0.005631249999999999,
+          "total_sd": 0.006385002236761399
+        },
+        {
+          "sigma_eps": 0.004694374999999999,
+          "total_sd": 0.0053741654840435225
+        },
+        {
+          "sigma_eps": 0.005162812499999999,
+          "total_sd": 0.005878035787125099
+        }
+      ],
+      "training_n": 2003,
+      "training_end": "2017-12-29",
+      "reference_J": 0.4
+    }
+  },
+  "stability": {
+    "JPY": [
+      {
+        "J": 0.3,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.35,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.4,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.45,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.5,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.55,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.6,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.65,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.7,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.75,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.78,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.8,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.82,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.8333333333333334,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.85,
+        "count": 3,
+        "n": 500,
+        "fraction": 0.006,
+        "lo": 0.0020425962719602363,
+        "hi": 0.01749025210405338
+      },
+      {
+        "J": 0.9,
+        "count": 407,
+        "n": 500,
+        "fraction": 0.814,
+        "lo": 0.7775459059402153,
+        "hi": 0.8456660082499298
+      },
+      {
+        "J": 0.95,
+        "count": 500,
+        "n": 500,
+        "fraction": 1.0,
+        "lo": 0.9923756595384479,
+        "hi": 1.0
+      },
+      {
+        "J": 1.0,
+        "count": 500,
+        "n": 500,
+        "fraction": 1.0,
+        "lo": 0.9923756595384479,
+        "hi": 1.0
+      }
+    ],
+    "EUR": [
+      {
+        "J": 0.3,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.35,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.4,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.45,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.5,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.55,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.6,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.65,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.7,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.75,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.78,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.8,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.82,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.8333333333333334,
+        "count": 0,
+        "n": 500,
+        "fraction": 0.0,
+        "lo": 4.336808689942018e-19,
+        "hi": 0.007624340461552241
+      },
+      {
+        "J": 0.85,
+        "count": 2,
+        "n": 500,
+        "fraction": 0.004,
+        "lo": 0.0010976305226827934,
+        "hi": 0.014465715215177033
+      },
+      {
+        "J": 0.9,
+        "count": 383,
+        "n": 500,
+        "fraction": 0.766,
+        "lo": 0.7269485494684876,
+        "hi": 0.8009953014059666
+      },
+      {
+        "J": 0.95,
+        "count": 500,
+        "n": 500,
+        "fraction": 1.0,
+        "lo": 0.9923756595384479,
+        "hi": 1.0
+      },
+      {
+        "J": 1.0,
+        "count": 500,
+        "n": 500,
+        "fraction": 1.0,
+        "lo": 0.9923756595384479,
+        "hi": 1.0
+      }
+    ]
+  },
+  "eligible": {
+    "JPY": [
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.78,
+      0.8,
+      0.82,
+      0.8333333333333334,
+      0.85
+    ],
+    "EUR": [
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.78,
+      0.8,
+      0.82,
+      0.8333333333333334,
+      0.85
+    ]
+  },
+  "cache_keys": {
+    "JPY_stability_J0.30000000.npz": "19d38064cc935bb26483a10474867320c8ee30b96461ae638d13aaa019650ff3",
+    "JPY_stability_J0.35000000.npz": "8fddb760427841ab9ed5fcc7b49cc800ee5fa4430e617833facb8ce585fdf3d3",
+    "JPY_stability_J0.40000000.npz": "4356719de8eb043ad724f5eae25ff56187ce82148561909557f53281c4443077",
+    "JPY_stability_J0.45000000.npz": "d6176ea28c35d8c5195dc71979b8b3c8d9fc91291c41c336d33792c877f32880",
+    "JPY_stability_J0.50000000.npz": "c7b7a4c930b5c3c09547c7d039e78b0e13e0fe6402cafac11cfc0cf6be0d06f2",
+    "JPY_stability_J0.55000000.npz": "29360383f3bf5d09007cd4667ebba8faf24f99f6c15094568f2a1f9337fc1cca",
+    "JPY_stability_J0.60000000.npz": "0f80c427d9c6a34df5091465ddf54dd6b8e820b1c486e2ae4070261609058265",
+    "JPY_stability_J0.65000000.npz": "27f8d103902ee0016fa107d2de75c4ae52163a01cb3b34afbc2fa6da4391a1fc",
+    "JPY_stability_J0.70000000.npz": "06d0e65cfa2e08fb25b177ba711a52b0187d575911e07e3a188152a8cbd0b5c2",
+    "JPY_stability_J0.75000000.npz": "9a49c454df9792b4b8348b4a9a6cef7df575b9fb7af6350465aec4ba1e414a95",
+    "JPY_stability_J0.78000000.npz": "73d6fe3b722e51f94f78bd5961623be6b7818dd2bbac0078f4b0a1df2c7fa386",
+    "JPY_stability_J0.80000000.npz": "568d9037390948f38afdb8c8029a3f7f0b5d89b96ce661bf5e2c0e3b5f7bd030",
+    "JPY_stability_J0.82000000.npz": "3611156b3658055574b31fbad798466b134e5dad9b1c652750fe4e93b630b5e3",
+    "JPY_stability_J0.83333333.npz": "e1902e50a23ab3ff0fa56758b88e713558c47ce6f4300fc978950b8e18c3da3e",
+    "JPY_stability_J0.85000000.npz": "c3131bd99d14f349b48fae348b620a66442eaca93084182be731cabc914ffe4e",
+    "JPY_stability_J0.90000000.npz": "1b16d688dede7ca8ee4c25e9e3c8f170b2bd361a3c0038b7a2a04818587933f1",
+    "JPY_stability_J0.95000000.npz": "4003ddb7f13397b11e1f86f05ab9a59d603598ec8cff103776eee50b5d9e987b",
+    "JPY_stability_J1.00000000.npz": "0a2708c18c80d6a23688c5bd0f7abbe4ea734c7508f98028857dbbf94571ee60",
+    "JPY_bank_J0.30000000.npz": "88b093ebe34a510453e2cc9eb6353bcd5a286cedebae4fe9a7b8d70295fb3866",
+    "JPY_bank_J0.35000000.npz": "7ea501f63ddef70f828d78e21923b063f6dd2d4b15a408f7953f06de2d81c522",
+    "JPY_bank_J0.40000000.npz": "d0853f6ccb04e70795a8e60bd0355417bf9d4bcae82372f1e198e343ecd70d7b",
+    "JPY_bank_J0.45000000.npz": "2c00fe18ba6dfa54cd5c29a36e6fa0a686e1a76ce4faf7dc967cefe4ac5cc97f",
+    "JPY_bank_J0.50000000.npz": "4faf487229f0a6a15668c7571e5e09c48a49346a4e3d8cda16d121b040c1dbea",
+    "JPY_bank_J0.55000000.npz": "485f414d926c448b100b14165743e132455aba814d491769f53bc8bf460e6feb",
+    "JPY_bank_J0.60000000.npz": "1958602ca7aba03b37cba70e95f3bd85ee057dff413692bb717ce1d5defbaed3",
+    "JPY_bank_J0.65000000.npz": "0fb841b556f4153a1aefc61d68e5cbebbbbd5d218dd97915c5b0673b3425666a",
+    "JPY_bank_J0.70000000.npz": "bf608b1f6765cd8f0159f3556f8d9539570d3450409d5599c5915be683a125a5",
+    "JPY_bank_J0.75000000.npz": "0559ebb416c425a1158b2088ed33392c31d49262ac7aeab2d6162e88898b03b8",
+    "JPY_bank_J0.78000000.npz": "0194bc33126684eed5d515ebb4d9fa4255a834097812045ff483f5e385aab7fc",
+    "JPY_bank_J0.80000000.npz": "f7441e0e0c519b86895871a14ce5a4ad947179da83f6120e9d1987446efc2ba0",
+    "JPY_bank_J0.82000000.npz": "ca8600b285d50500d47b6d5109c0e0181fc35b4636065ea8ad82fc7f0e0e77b0",
+    "JPY_bank_J0.83333333.npz": "af78bb58c100d772d96f86d43ade3ff8798c60925326e86ba8dd4fed0bfc9878",
+    "JPY_bank_J0.85000000.npz": "6753e06795d5b342e395dbeba7347762c268e0d59906ac5c12aed9223607966b",
+    "JPY_pseudo_J0.40000000.npz": "69ec3cc74c5df1e0248ac966e8206ba756388a0ebbb52336e21f450a00484d92",
+    "JPY_horizon_J0.40000000.npz": "d70974ee0e1e04e0a37756bdec809538d7dcdbe6b0d3c7d1e05c956ee23746b1",
+    "JPY_pseudo_J0.78000000.npz": "6d2d926542232cbe241aa1b15e72a95331caa22fed5eafc74c5f1e3382ab6881",
+    "JPY_horizon_J0.78000000.npz": "b7a343569b7bf1d72a917a02b6548d56483217052db809ba08017f81f4b984f6",
+    "EUR_stability_J0.30000000.npz": "f6203f9b102ec99be34b31ef3798a39267bc22b5bd29862fa2623bf9b76c401a",
+    "EUR_stability_J0.35000000.npz": "25a009788c81854bd43a31f643ded105f159bddeace6078303fdcb80605ea492",
+    "EUR_stability_J0.40000000.npz": "4b42146afff8f542ad6f334f4f8a724bee0132375028bd46622d32b7b0736213",
+    "EUR_stability_J0.45000000.npz": "aeffc34b769fe8ce0286122cca219441f2c7a2d9a5fca1139e4d7bfb06f81558",
+    "EUR_stability_J0.50000000.npz": "9a916a1b2d8b78daaee51212c19b9250851dbe0ddccb31c474cb7829bd5a65a1",
+    "EUR_stability_J0.55000000.npz": "0c2c1bc18cce9bc904333dbae95004a95d2a70cacea632c3bbb6e9e14fe3ac39",
+    "EUR_stability_J0.60000000.npz": "40f74ca32331a81dacb8e8c7eaf3196ffdc891e4ac9b4c40f77fb7c2da7bcad8",
+    "EUR_stability_J0.65000000.npz": "ec06420cdff603757abd8aea142e24f4fe33805fcfb3a0eade663c5044d8836d",
+    "EUR_stability_J0.70000000.npz": "0a8526c937e478441261bbc2c3bd2d3919817e3e0ab86a1b68be845846251e68",
+    "EUR_stability_J0.75000000.npz": "b3b1c023585d8b0bfe9592761a10f8c28a2470301c2abc0b21dfe667bbf2f9bd",
+    "EUR_stability_J0.78000000.npz": "5ebb6847a1f7857e7e0d9ebadccb2f456bcf52fbed0b5e07e1742444744f2c3e",
+    "EUR_stability_J0.80000000.npz": "a0052b7154329093d2e007e1d217ebe99b11da656a86f510df36e662e45b2d3b",
+    "EUR_stability_J0.82000000.npz": "17476c34a3581e83b1a743bc61b5d8b6979c6690031795c65673cdf359809385",
+    "EUR_stability_J0.83333333.npz": "ada4e6df8e231b979cbe66a54f0cb46062e6f37277f7104cfd0fb1df1b0eb58d",
+    "EUR_stability_J0.85000000.npz": "1a7f54c77f60125c9d7b68710e2a7169cf8b14df7d1c151d407c410631164c8c",
+    "EUR_stability_J0.90000000.npz": "bc23afd1c72715e7a9adc98ff481dd2a4ef4dde1b97859c8b67370f11ab10711",
+    "EUR_stability_J0.95000000.npz": "566af5caf0ef213816826839cdc7c369be7ba27097e38fb5afb600e65d0c85a7",
+    "EUR_stability_J1.00000000.npz": "319a3caeef08b21e6277195f527e2f79ec497e5d6d1d8567cd6c27db2a346555",
+    "EUR_bank_J0.30000000.npz": "778dcb7e3bd291ffc0842b5ec3389e33cc0d979c405fb9b5cd2aeca5c4660d57",
+    "EUR_bank_J0.35000000.npz": "dc5eb40ec0b313acda8c7e9eceabb0f81744ec7e906010806127d9e0e424556d",
+    "EUR_bank_J0.40000000.npz": "a51d51bcc869a7570b2b4e41f7c2fbc969a9c1da9471d42513d2ae3d942cd286",
+    "EUR_bank_J0.45000000.npz": "9f5a89edd5fee0da08702d215d3693dba52c8eccf49a57edfd353ebfb0bf3533",
+    "EUR_bank_J0.50000000.npz": "dfc744f2c95d67832a9fcd17e8e399ddb9b6fb264d21b8cb9c691a220fc80175",
+    "EUR_bank_J0.55000000.npz": "6aaa44b72e00e3bb729f7195958b4a0846eb89e3f0af555d982b1f98e3065486",
+    "EUR_bank_J0.60000000.npz": "e963ca019c53fadd974e8dedf8d4671321d72e010882e99fba69a8a9714aff05",
+    "EUR_bank_J0.65000000.npz": "339690c3a1a537dac25bfdf7796be3bf056bc7d9269d3b681cf195ceed661a30",
+    "EUR_bank_J0.70000000.npz": "cbf150f6871aa7b431b8dfc395617cfd2722676d6531f63b1d69bf08f2944a40",
+    "EUR_bank_J0.75000000.npz": "3509ebbf3f7b0299a3e2bf5e1aed16448ae18df78a88ca660d9df75c53ebb69d",
+    "EUR_bank_J0.78000000.npz": "681357d344d64ca9b97aff0cc766f39c051130e67a51ef14c7da9ea95587dcef",
+    "EUR_bank_J0.80000000.npz": "e368d4d2d9534ea782158fb3433eaec1f619c9a722e96573f54d0dfa524befda",
+    "EUR_bank_J0.82000000.npz": "a2dcd86232934606a7267efff68cb1a8fd48dcf7b8ef86169fc4cd2f48c217d3",
+    "EUR_bank_J0.83333333.npz": "2259f41cee6d1d79328c7db38d8de0e65dc02d342cc2ed5541f7533ac169c775",
+    "EUR_bank_J0.85000000.npz": "0bae3a97bdec92c85c0950cfad01348707139c09d2170a0b6e732233ef3d4c24",
+    "EUR_pseudo_J0.40000000.npz": "6720abde4ed0ba0205d84f2004b06da696f4395c84745fa1dcfe14f66b784773",
+    "EUR_horizon_J0.40000000.npz": "b463e20c696b846ccc48abab44077f7f2cf5a58606dcf008e746e884ea964d4e",
+    "EUR_pseudo_J0.78000000.npz": "4dafa4f525cb61510802cf8d71f1a8543420e98f4e104ed20bbaa0d7663edc18",
+    "EUR_horizon_J0.78000000.npz": "5c42589c059093702ddaa7a1d2af23eaf45a1d94093020a6ba6f480d62a8d216"
+  },
+  "cache_sha256": {
+    "JPY_stability_J0.30000000.npz": "5ec444e8f25192b77b578f5b33027578c8ad102958894b4f213edd01bee5c2b5",
+    "JPY_stability_J0.35000000.npz": "563d74753a64f8744261995b39e567b4d09c7453df64ec49a00eaa6b333d0323",
+    "JPY_stability_J0.40000000.npz": "9ffb8bdced521ac41c679563c01a049bcf2efb259db7ba7729d590f14c1cc1d0",
+    "JPY_stability_J0.45000000.npz": "a0b07478d758f4886227896724fd65ad0dfe7e8842562a0df27c7caf30960d7c",
+    "JPY_stability_J0.50000000.npz": "d81e7880b55aad7249fc45a828101b35986f6e5443c2d9b11029527b316a9dec",
+    "JPY_stability_J0.55000000.npz": "c500044e5a085e3fb28d9534d6dc02faa8f621773bdd7a28be081c5d1f09996f",
+    "JPY_stability_J0.60000000.npz": "52d4d0a8e5a243817869d1f78905633f247bc26a8b4e2f812872425d6cf84b8a",
+    "JPY_stability_J0.65000000.npz": "8b03e5ee0e488616f6c5ba699a85b5d3c4bc3104d55cc4230fef0a1f850cac36",
+    "JPY_stability_J0.70000000.npz": "725e59c5e22e3557987b8e09f1577a42b254b7fb017484e61e2f507b5f576f0b",
+    "JPY_stability_J0.75000000.npz": "a3a42353b9afe523d61bd064012f71ec0ca3c509b9585efc0fe0a3cdf00a0f2a",
+    "JPY_stability_J0.78000000.npz": "56f483c2f13ddab98197879241bb1a0d01f6d33ba8400140a0c4533e6de7590c",
+    "JPY_stability_J0.80000000.npz": "c6bddde787a07a146dde75b8acb9175f2ed3894f6d07971e3ab557c56d64611f",
+    "JPY_stability_J0.82000000.npz": "ff9c019fd827d16f3f3ac72fc95c449de518bfa11f03f7eea85ca99652c7a047",
+    "JPY_stability_J0.83333333.npz": "de6d1cba48d3df723d89b0a45677784e691e713f703b4970f4f6f12399790a8b",
+    "JPY_stability_J0.85000000.npz": "a94d9c1af8f757d2a9254b8405f8af27b12526b39b61df4280b635098e60440a",
+    "JPY_stability_J0.90000000.npz": "44c86c1cbf746c4400ce30d5358686133bcdef10115d1c96cd85732b7b9ba700",
+    "JPY_stability_J0.95000000.npz": "ae38559d8c004c6ebbc243fb39b6210659438713289d70743d22765e566a53be",
+    "JPY_stability_J1.00000000.npz": "225a17bec3301614144ac1bb9681bc817e980f440d3ac3b4d54a1f5d884c8542",
+    "JPY_bank_J0.30000000.npz": "e9f422965fb3c8a82582ff7092745ce4d1bde02dc9747e818f51d45edb5197a3",
+    "JPY_bank_J0.35000000.npz": "81328c6a702cf07462fa759719293d945cd9a074bca80a8741989e611285e261",
+    "JPY_bank_J0.40000000.npz": "3c8a95ca31c4261be34da3368ccbec3b4b564a88532887e02ff963a936cab7d2",
+    "JPY_bank_J0.45000000.npz": "ca8e9ee9b12851f2d823e256bd9c24cfdf1fe628c6e7f6d63fa1d16b0399fcee",
+    "JPY_bank_J0.50000000.npz": "a5299956bfa8e4ae0683ca2064bd29d124cac8cb418a255ac0a1554db9cdf0f3",
+    "JPY_bank_J0.55000000.npz": "2a16b477035578181cd3b3192913e8b46a737f15be7478b70202264b2e09dadf",
+    "JPY_bank_J0.60000000.npz": "0dcc66c9424228598ebc9ad98292e93ade5b035a0fb14120433322de97aa48a2",
+    "JPY_bank_J0.65000000.npz": "4372ae1a70da00fddac2d36dc01ee49c0ad05f7ffc5e07a105e850180d7c02e4",
+    "JPY_bank_J0.70000000.npz": "e6104040232e47d56c4175dffa1a5e4d0f1ad0ca41e9019825a83f29d375c2f8",
+    "JPY_bank_J0.75000000.npz": "15938fafa7c05b93782e03fda8269b540fe99414a76ca16ee86093c2e5e79ebc",
+    "JPY_bank_J0.78000000.npz": "373f62da626d8e5c8fee0a9bf82fc01090a50e89a46310e39723e73abc3a6fd8",
+    "JPY_bank_J0.80000000.npz": "e069b18617b2463abbe6137f2f68652c754faaee9d3c47896f1841f64a6983d3",
+    "JPY_bank_J0.82000000.npz": "e1387c027d13187972dbe43b8e03ed5546ce8b6d17e868a76d1072e043ef5400",
+    "JPY_bank_J0.83333333.npz": "9d33178c28f60f11b087c02c70352f1ff6f990c6bdfa155ca1148cbc193db0e0",
+    "JPY_bank_J0.85000000.npz": "61cf7d03d36c7f834c5ecb3d491d463d0ff2c5fd5ea2ed2b232cb7138cafd059",
+    "JPY_pseudo_J0.40000000.npz": "7c5a60da8dcf4e8a79caad9725ee4078e3c4c3cc3558e2ce0ae81473c4f00ae5",
+    "JPY_horizon_J0.40000000.npz": "39ee599585da3a10a041fb6f515385a3660284b1596b78dce9c3f7ce95717782",
+    "JPY_pseudo_J0.78000000.npz": "cceed0d5a640cc1718d4b2dc688a819de01244b77e60e5d334e88501a8064c54",
+    "JPY_horizon_J0.78000000.npz": "16d43903c052021a55d15bca9d657f629d21cc49f9ae2520fd2da80a9e3b90f7",
+    "EUR_stability_J0.30000000.npz": "190cd59e6d76d4d5cf630ceb1162a62401a7b167b790cebd84597bcd7c57b835",
+    "EUR_stability_J0.35000000.npz": "8de1366a251950ec5d7a5e5c72dfbc77ed7a6f8a381576e721adac5b8d39209d",
+    "EUR_stability_J0.40000000.npz": "24b6c25e2a4fe1d1d7a29b28e150063039a2e6edb6bdfe4967f69ac5623b1ba0",
+    "EUR_stability_J0.45000000.npz": "f48fe6631e9684d87e555f6db5cf748b2dbf7f5d952be1394ca47e7afaf6ee5c",
+    "EUR_stability_J0.50000000.npz": "08493301e266a9d24e794b2da8cbef40deff6ee8aa654ce2f4ca35551ec0a0aa",
+    "EUR_stability_J0.55000000.npz": "ddafd51dffef00932f32f07be11ccd0ca04f9968779f3f3e9517cff6759ca604",
+    "EUR_stability_J0.60000000.npz": "99ac785c9866049b677c5d98dc7e7dde98262b1904d34c886bc17e89bdb5c7f3",
+    "EUR_stability_J0.65000000.npz": "9ee43599577e6fe4e8c65674e84116319917e801df0c62bab7411ca422eea888",
+    "EUR_stability_J0.70000000.npz": "5ee980760f6f32b879e4ba4ba29c3bc2822bb7ebec63676964bbc085e2ab35ec",
+    "EUR_stability_J0.75000000.npz": "9b22eb980b978ff35eb270e33871183a672c21d61ff57bf2d55126dadcbf20c7",
+    "EUR_stability_J0.78000000.npz": "6888425e913fa61e0d6c50e4d117d4c926721f416c6782b9eaef0d3c092294fc",
+    "EUR_stability_J0.80000000.npz": "c4dfc81109e57faab1338afdf390ee2170e98790232ba472930acea5801ba858",
+    "EUR_stability_J0.82000000.npz": "d1f8d15f495980d4f8f8aad18b9b15b6675a88a8ae04014c43d1002135efa17f",
+    "EUR_stability_J0.83333333.npz": "bf541e5b7d8011d674eed07d250c580fd972aabc015eeab4ad3cade988944fa6",
+    "EUR_stability_J0.85000000.npz": "b9a1d8a1f94da07189e0527a07efa8202cde0e95efaffaa92a0be9a9f0a5f47c",
+    "EUR_stability_J0.90000000.npz": "fbafab812715880a2d4aa9acc2d60e63698bc0535d1537b5fdd0b699ae73eeb1",
+    "EUR_stability_J0.95000000.npz": "e6f7cbe697dd7553072631f98cbf5189dcef27a1d67d509da5dedcbbc4dfee7b",
+    "EUR_stability_J1.00000000.npz": "361edd3ade379a8b7676935757a5d9ad56f474c6c5210a78b12c9697a73f524d",
+    "EUR_bank_J0.30000000.npz": "e14287c90fcbd2470977c588e3332376f494caf9981877ee38ccede1af2f0d97",
+    "EUR_bank_J0.35000000.npz": "3aa00bc1b5e8a2ebd7118e6c7f4f2836fc3b0f1616fc527ea2b7bc25c144d557",
+    "EUR_bank_J0.40000000.npz": "6060bad06429d409cace315280140906ffd10b7bcb838e94713b240c364cbecf",
+    "EUR_bank_J0.45000000.npz": "f03c55170e284ac33808c5e37dc855b4c3facd872ee3d019ce0ed56106e4d898",
+    "EUR_bank_J0.50000000.npz": "06720f6cb75ebfa0958a4a575fb1fd248b80f638587a72399f3a828a1cd4dd62",
+    "EUR_bank_J0.55000000.npz": "03ba91cabc445be4726e527af36584ce7d3dab0dacf9d04df66b349d7b7ff66d",
+    "EUR_bank_J0.60000000.npz": "d524cadbe7f0b178168bf4f0e54722af723c9f1940c04726de4637b20f58b6a9",
+    "EUR_bank_J0.65000000.npz": "617f015fb5a9069d345613e08cffb2ed1763c38d6aaf1b5a9601a3bacf1483c7",
+    "EUR_bank_J0.70000000.npz": "ea4af38ddf8de519dfcf8c0c0d6518747c70d2ef122156fbcdd89070ee88c7f3",
+    "EUR_bank_J0.75000000.npz": "a1295535b38584a95ff82ee34b9decaa7d8c3090808f6776babf03d0ba628a8f",
+    "EUR_bank_J0.78000000.npz": "496d5ad20ee663208f080df3da71d8c36897ebf63aae3d28aab50596932be2d5",
+    "EUR_bank_J0.80000000.npz": "83bc8c22731a2e9c4201cddaad18ed6fc33b017ff3f51bfe9b5790073e91ad31",
+    "EUR_bank_J0.82000000.npz": "a89e6eb661484ac78b703486b80856d8d69e3a4651c1713a0f22bdfc92a19296",
+    "EUR_bank_J0.83333333.npz": "fef5f21a451405cd84d9f99b2d4ae55a3a58fb09ae398e5fa800d658e177fc91",
+    "EUR_bank_J0.85000000.npz": "5274e1e34254d04a31feac84261c98a080d96cf72ca33b070d9e408fae223e77",
+    "EUR_pseudo_J0.40000000.npz": "affebfe681612f939157aff0729fabc6497c2ba57b3672cee728e7502f5e63af",
+    "EUR_horizon_J0.40000000.npz": "9fa795802ae063f5c0d1f15b96a5c972a43307b86decdd04633d096046923c00",
+    "EUR_pseudo_J0.78000000.npz": "dc6bb16ead7a6d145d873cbafd724fe5a6da29e45bb6bbaa79e455f18d11e173",
+    "EUR_horizon_J0.78000000.npz": "f3f3f18f0eba274ae8d7b6256a50263043881ddcc4ccca87174fc5257ec35622"
+  },
+  "comparison_J": {
+    "JPY": 0.78,
+    "EUR": 0.78
+  },
+  "completed_at_utc": "2026-09-15T16:06:54.728167+00:00"
+}

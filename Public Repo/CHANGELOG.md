@@ -5,6 +5,12 @@ All notable changes to PBMRS are documented here.
 ## [Unreleased]
 ### Added
 - Documentation foundation (model spec, architecture, configs, test plan)
+- FX companion notebook with a timestamped primary JPY design, EUR falsification,
+  solved innovation scales, new stability/calibration/power runs, and recovery diagnostics.
+- Shared-data FX adapter with verified quote direction, official CFTC contract discovery,
+  legacy/TFF reconciliation, and contract-isolated raw caches.
+- Minimum-distance rolling J estimates, discrete Neyman-inversion sets, retrospective
+  matched event tests, and fixed-split sequential validation.
 
 ### Changed
 - N/A

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "design_status": "declared before FX rolling estimates or event results",
+  "start": "2010-01-01", "end": "2026-09-15", "split": "2018-01-01",
+  "primary": {"pair": "JPY", "window": 500, "K": 21, "alpha": 0.10, "alternative": "greater", "outcome": "pre-episode minimum-distance J minus volatility-matched non-episode J", "sample": "held-out 2018 onward"},
+  "windows": [250, 500], "step": 21,
+  "J_grid": [0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.78, 0.80, 0.82, 0.8333333333333334, 0.85, 0.90, 0.95, 1.00],
+  "burn": 500, "nlags": 8, "n_cal": 500, "n_null": 999,
+  "n_stability": 500, "stability_length": 2000, "eligibility_max_rate": 0.01,
+  "n_pseudo": 500, "n_bootstrap": 1000, "n_permutation": 4999,
+  "power_lengths": [144, 250, 500, 1000, 2000],
+  "sigma_reference_J": 0.40, "sigma_training_only": true,
+  "sigma_solver_paths": 100, "sigma_solver_relative_tolerance": 0.005,
+  "positioning_primary": "tff_futures",
+  "event": {"prior_net_short_min": 0.05, "net_short_fall_min": 0.05, "appreciation_sd_min": 1.5, "volatility_lookback": 250, "minimum_spacing_sessions": 42, "max_report_gap_days": 10, "controls_per_event": 5, "max_log_vol_distance": 0.25, "matching": "same calendar year and volatility neighborhood; no episode within 42 sessions; predictions frozen before preceding COT report", "timing": "retrospective Tuesday labels; no claim of real-time COT availability"},
+  "seeds": {"solver": [700000, 700099], "stability": [710000, 710499], "calibration": [720000, 720499], "null": [720500, 721498], "pseudo": [730000, 730499], "horizon": [740000, 740499], "bootstrap": 750000, "permutation": 760000, "gaussian": [770000, 770499]},
+  "common_random_numbers": "Same seeds across J, pairs and horizons induce correlated Monte Carlo errors. Calibration, null and pseudo ranges are disjoint.",
+  "secondary": ["JPY 250-session window", "EUR falsification at both windows", "training-segment event contrasts", "annual held-out evaluation with nuisance parameters frozen at the initial split", "FX-scale power", "21-session unconditional horizon contrast"],
+  "scope": "Tests squared-return ACF and association with retrospectively labelled short-covering episodes. Does not identify carry causality, tail adequacy or a claim from an unavailable GMSG FX report.",
+  "historical_scale_evidence": {"status": "prior measurements supplied in build brief; not newly estimated", "paths": 250, "T": 2000, "rows": [{"analogue": "EURUSD", "sigma_eps": 0.0045, "pathological_J040": 0.0, "pathological_J078": 0.0, "flow_share_J040": 0.24, "flow_share_J078": 0.41}, {"analogue": "SPX", "sigma_eps": 0.011, "pathological_J040": 0.0, "pathological_J078": 0.048, "flow_share_J040": 0.20, "flow_share_J078": null}, {"analogue": "WTI", "sigma_eps": 0.0418, "pathological_J040": 0.992, "pathological_J078": 1.0, "flow_share_J040": null, "flow_share_J078": null}]}
+}

@@ -1,0 +1,6 @@
+# Raw response caches are hashed byte-for-byte by their manifests.  Keep Git
+# from rewriting their line endings on Windows checkouts.
+notebooks/data_cache/fred_*.csv binary
+notebooks/data_cache/cftc_*.json binary
+# Derived FX JSON payloads also have exact-byte hashes.
+notebooks/fx_cache/** binary

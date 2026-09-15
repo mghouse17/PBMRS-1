@@ -76,6 +76,7 @@ Explore the maintained notebooks:
 - [MVP simulation](notebooks/00_pbmrs_mvp.ipynb)
 - [Phase-transition diagnostics](notebooks/01_pbmrs_phase_transition.ipynb)
 - [FRED WTI regime calibration](notebooks/02_wti_regime_calibration.ipynb)
+- [FX regime calibration and carry-unwind proxy study](notebooks/03_fx_regime_calibration.ipynb)
 
 Rebuild the application analysis and notebook with:
 
@@ -83,6 +84,30 @@ Rebuild the application analysis and notebook with:
 python notebooks/build_gmsg_analysis.py
 python notebooks/build_gmsg_notebook.py
 ```
+
+The FX companion preserves the WTI result and uses the same canonical simulator
+and ACF implementation. Its design is frozen in `configs/fx_study.json` and
+timestamped in `notebooks/fx_cache/preregistration.json` before analysis. JPY is
+primary; EUR is a falsification control. Both quotes use USD per foreign currency.
+FX positioning uses discovered CFTC legacy/TFF definitions and contract codes.
+
+Rebuild the FX study from this directory using the installed notebook environment:
+
+```bash
+python notebooks/build_fx_data.py
+python notebooks/build_fx_simulations.py --workers 12
+python notebooks/build_fx_results.py
+python notebooks/build_fx_notebook.py
+jupyter nbconvert --to notebook --execute --inplace notebooks/03_fx_regime_calibration.ipynb
+```
+
+Only an uncached data build needs network access. Full simulation regeneration is
+computationally intensive; verified committed caches support offline notebook
+execution. Changing a frozen design or simulation inputs fails loudly rather than
+silently reusing results. For a new study, use a separate labelled cache directory.
+The minimum-distance point estimate and discrete non-rejected J set are separate
+objects. Event labels and matching are retrospective; this is not a live trading
+backtest. See [FX study methodology](docs/fx_study.md) for assumptions and limits.
 
 ## Running the API and dashboard
 

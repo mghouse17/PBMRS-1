@@ -66,12 +66,15 @@ def test_every_maintained_notebook_is_fully_executed_without_errors():
         "00_pbmrs_mvp.ipynb",
         "01_pbmrs_phase_transition.ipynb",
         "02_wti_regime_calibration.ipynb",
+        "03_fx_regime_calibration.ipynb",
     ]
     for path in notebooks:
         notebook = json.loads(path.read_text(encoding="utf-8"))
         code_cells = [c for c in notebook["cells"] if c["cell_type"] == "code"]
         assert code_cells
         assert all(cell.get("execution_count") is not None for cell in code_cells)
+        counts = [cell["execution_count"] for cell in code_cells]
+        assert all(a < b for a, b in zip(counts, counts[1:]))
         assert not [
             output
             for cell in code_cells

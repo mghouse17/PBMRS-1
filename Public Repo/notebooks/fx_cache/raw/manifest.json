@@ -1,0 +1,149 @@
+{
+  "entries": {
+    "cftc_catalog.json": {
+      "byte_count": 129,
+      "cache_file": "cftc_catalog.json",
+      "request_parameters": "domains=publicreporting.cftc.gov&limit=100",
+      "retrieved_at_utc": "2026-09-15T15:38:58.901022+00:00",
+      "sha256": "d5184acae98546b25335c1fd6c5a2562a34aeba56a52387601faa572e763859a",
+      "source_name": "cftc_catalog.json",
+      "url": "https://api.us.socrata.com/api/catalog/v1?domains=publicreporting.cftc.gov&limit=100"
+    },
+    "cftc_contract_legacy_combined_EUR.json": {
+      "byte_count": 109,
+      "cache_file": "cftc_contract_legacy_combined_EUR.json",
+      "request_parameters": "%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27EURO+FX+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100",
+      "retrieved_at_utc": "2026-09-15T15:40:56.788577+00:00",
+      "sha256": "5b7a80f5392d5765225a2932bc36b29bf34f4a3c414532c99ea3d8961a2e924f",
+      "source_name": "cftc_contract_legacy_combined_EUR.json",
+      "url": "https://publicreporting.cftc.gov/resource/jun7-fc8e.json?%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27EURO+FX+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100"
+    },
+    "cftc_contract_legacy_combined_JPY.json": {
+      "byte_count": 114,
+      "cache_file": "cftc_contract_legacy_combined_JPY.json",
+      "request_parameters": "%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27JAPANESE+YEN+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100",
+      "retrieved_at_utc": "2026-09-15T15:40:49.946727+00:00",
+      "sha256": "5ce91789f5a04919d3d9914688e6d95c3abfa8dad415366414a8497472879f46",
+      "source_name": "cftc_contract_legacy_combined_JPY.json",
+      "url": "https://publicreporting.cftc.gov/resource/jun7-fc8e.json?%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27JAPANESE+YEN+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100"
+    },
+    "cftc_contract_legacy_futures_EUR.json": {
+      "byte_count": 109,
+      "cache_file": "cftc_contract_legacy_futures_EUR.json",
+      "request_parameters": "%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27EURO+FX+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100",
+      "retrieved_at_utc": "2026-09-15T15:40:55.221256+00:00",
+      "sha256": "5b7a80f5392d5765225a2932bc36b29bf34f4a3c414532c99ea3d8961a2e924f",
+      "source_name": "cftc_contract_legacy_futures_EUR.json",
+      "url": "https://publicreporting.cftc.gov/resource/6dca-aqww.json?%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27EURO+FX+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100"
+    },
+    "cftc_contract_legacy_futures_JPY.json": {
+      "byte_count": 114,
+      "cache_file": "cftc_contract_legacy_futures_JPY.json",
+      "request_parameters": "%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27JAPANESE+YEN+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100",
+      "retrieved_at_utc": "2026-09-15T15:40:48.794511+00:00",
+      "sha256": "5ce91789f5a04919d3d9914688e6d95c3abfa8dad415366414a8497472879f46",
+      "source_name": "cftc_contract_legacy_futures_JPY.json",
+      "url": "https://publicreporting.cftc.gov/resource/6dca-aqww.json?%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27JAPANESE+YEN+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100"
+    },
+    "cftc_contract_tff_combined_EUR.json": {
+      "byte_count": 109,
+      "cache_file": "cftc_contract_tff_combined_EUR.json",
+      "request_parameters": "%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27EURO+FX+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100",
+      "retrieved_at_utc": "2026-09-15T15:40:58.960285+00:00",
+      "sha256": "5b7a80f5392d5765225a2932bc36b29bf34f4a3c414532c99ea3d8961a2e924f",
+      "source_name": "cftc_contract_tff_combined_EUR.json",
+      "url": "https://publicreporting.cftc.gov/resource/yw9f-hn96.json?%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27EURO+FX+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100"
+    },
+    "cftc_contract_tff_combined_JPY.json": {
+      "byte_count": 114,
+      "cache_file": "cftc_contract_tff_combined_JPY.json",
+      "request_parameters": "%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27JAPANESE+YEN+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100",
+      "retrieved_at_utc": "2026-09-15T15:40:52.519654+00:00",
+      "sha256": "5ce91789f5a04919d3d9914688e6d95c3abfa8dad415366414a8497472879f46",
+      "source_name": "cftc_contract_tff_combined_JPY.json",
+      "url": "https://publicreporting.cftc.gov/resource/yw9f-hn96.json?%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27JAPANESE+YEN+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100"
+    },
+    "cftc_contract_tff_futures_EUR.json": {
+      "byte_count": 109,
+      "cache_file": "cftc_contract_tff_futures_EUR.json",
+      "request_parameters": "%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27EURO+FX+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100",
+      "retrieved_at_utc": "2026-09-15T15:40:58.055051+00:00",
+      "sha256": "5b7a80f5392d5765225a2932bc36b29bf34f4a3c414532c99ea3d8961a2e924f",
+      "source_name": "cftc_contract_tff_futures_EUR.json",
+      "url": "https://publicreporting.cftc.gov/resource/gpe5-46if.json?%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27EURO+FX+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100"
+    },
+    "cftc_contract_tff_futures_JPY.json": {
+      "byte_count": 114,
+      "cache_file": "cftc_contract_tff_futures_JPY.json",
+      "request_parameters": "%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27JAPANESE+YEN+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100",
+      "retrieved_at_utc": "2026-09-15T15:40:51.131399+00:00",
+      "sha256": "5ce91789f5a04919d3d9914688e6d95c3abfa8dad415366414a8497472879f46",
+      "source_name": "cftc_contract_tff_futures_JPY.json",
+      "url": "https://publicreporting.cftc.gov/resource/gpe5-46if.json?%24select=distinct+market_and_exchange_names%2Ccftc_contract_market_code&%24where=market_and_exchange_names%3D%27JAPANESE+YEN+-+CHICAGO+MERCANTILE+EXCHANGE%27&%24limit=100"
+    },
+    "cftc_metadata_6dca-aqww.json": {
+      "byte_count": 227045,
+      "cache_file": "cftc_metadata_6dca-aqww.json",
+      "request_parameters": "",
+      "retrieved_at_utc": "2026-09-15T15:40:00.326995+00:00",
+      "sha256": "4653a6650831670a1cd18cb1aea0892cdca0f5ededbe3aa65059b15b894fb8da",
+      "source_name": "cftc_metadata_6dca-aqww.json",
+      "url": "https://publicreporting.cftc.gov/api/views/6dca-aqww.json"
+    },
+    "cftc_metadata_gpe5-46if.json": {
+      "byte_count": 152770,
+      "cache_file": "cftc_metadata_gpe5-46if.json",
+      "request_parameters": "",
+      "retrieved_at_utc": "2026-09-15T15:40:01.837024+00:00",
+      "sha256": "dc3424ac6d79e5fe4e9bef8ac8b80dd0fc6c2958c45edc5c990f83b2e6690392",
+      "source_name": "cftc_metadata_gpe5-46if.json",
+      "url": "https://publicreporting.cftc.gov/api/views/gpe5-46if.json"
+    },
+    "cftc_metadata_jun7-fc8e.json": {
+      "byte_count": 226845,
+      "cache_file": "cftc_metadata_jun7-fc8e.json",
+      "request_parameters": "",
+      "retrieved_at_utc": "2026-09-15T15:40:01.208946+00:00",
+      "sha256": "e53d476a98d9e822351e1e45dd59eea1f8027d106a0219627c1a31807d80e73f",
+      "source_name": "cftc_metadata_jun7-fc8e.json",
+      "url": "https://publicreporting.cftc.gov/api/views/jun7-fc8e.json"
+    },
+    "cftc_metadata_yw9f-hn96.json": {
+      "byte_count": 152723,
+      "cache_file": "cftc_metadata_yw9f-hn96.json",
+      "request_parameters": "",
+      "retrieved_at_utc": "2026-09-15T15:40:47.457967+00:00",
+      "sha256": "f1c12e04177c289350e5000216c4a6b89276d56903aa4deb7994d2ae60e9d661",
+      "source_name": "cftc_metadata_yw9f-hn96.json",
+      "url": "https://publicreporting.cftc.gov/api/views/yw9f-hn96.json"
+    },
+    "cftc_views.json": {
+      "byte_count": 99211,
+      "cache_file": "cftc_views.json",
+      "request_parameters": "limit=100",
+      "retrieved_at_utc": "2026-09-15T15:39:59.590593+00:00",
+      "sha256": "fca0f87641c3caf155dea80e4947b315b2c8ea87ee3f793040cd8d6a918712ac",
+      "source_name": "cftc_views.json",
+      "url": "https://publicreporting.cftc.gov/api/views.json?limit=100"
+    },
+    "fred_DEXJPUS_2010-01-01_2026-09-15.csv": {
+      "byte_count": 76397,
+      "cache_file": "fred_DEXJPUS_2010-01-01_2026-09-15.csv",
+      "request_parameters": "id=DEXJPUS&cosd=2010-01-01&coed=2026-09-15",
+      "retrieved_at_utc": "2026-09-15T15:40:48.293530+00:00",
+      "sha256": "fadd8944919b929e90a6595181ffaad57064b098f633d1e8e98f9e99aa2853a6",
+      "source_name": "fred_DEXJPUS_2010-01-01_2026-09-15.csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DEXJPUS&cosd=2010-01-01&coed=2026-09-15"
+    },
+    "fred_DEXUSEU_2010-01-01_2026-09-15.csv": {
+      "byte_count": 77341,
+      "cache_file": "fred_DEXUSEU_2010-01-01_2026-09-15.csv",
+      "request_parameters": "id=DEXUSEU&cosd=2010-01-01&coed=2026-09-15",
+      "retrieved_at_utc": "2026-09-15T15:40:54.694587+00:00",
+      "sha256": "952f88a249e25d2669d027eb8af0aafda16301839d3ccbd7790ee7d83d00b5f7",
+      "source_name": "fred_DEXUSEU_2010-01-01_2026-09-15.csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DEXUSEU&cosd=2010-01-01&coed=2026-09-15"
+    }
+  },
+  "schema_version": 1
+}

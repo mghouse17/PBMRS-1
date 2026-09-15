@@ -1,0 +1,41 @@
+{
+  "entries": {
+    "cftc_6dca-aqww_2010-01-01_2026-09-15.json": {
+      "byte_count": 140619,
+      "cache_file": "cftc_6dca-aqww_2010-01-01_2026-09-15.json",
+      "request_parameters": "%24select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27097741%27+AND+report_date_as_yyyy_mm_dd+between+%272010-01-01T00%3A00%3A00.000%27+and+%272026-09-15T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=20000",
+      "retrieved_at_utc": "2026-09-15T15:40:49.523152+00:00",
+      "sha256": "b1a8134687a144f1988c0907f06f8ed25bab4cc678d1f63c5b77fc7bd6989444",
+      "source_name": "cftc_6dca-aqww_2010-01-01_2026-09-15.json",
+      "url": "https://publicreporting.cftc.gov/resource/6dca-aqww.json?%24select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27097741%27+AND+report_date_as_yyyy_mm_dd+between+%272010-01-01T00%3A00%3A00.000%27+and+%272026-09-15T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=20000"
+    },
+    "cftc_gpe5-46if_2010-01-01_2026-09-15.json": {
+      "byte_count": 136889,
+      "cache_file": "cftc_gpe5-46if_2010-01-01_2026-09-15.json",
+      "request_parameters": "%24select=report_date_as_yyyy_mm_dd%2Clev_money_positions_long%2Clev_money_positions_short%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27097741%27+AND+report_date_as_yyyy_mm_dd+between+%272010-01-01T00%3A00%3A00.000%27+and+%272026-09-15T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=20000",
+      "retrieved_at_utc": "2026-09-15T15:40:52.169192+00:00",
+      "sha256": "e74ea7b330f7702484afce2032e72dddec71166ddc0bea67bee9811a8c3c9c98",
+      "source_name": "cftc_gpe5-46if_2010-01-01_2026-09-15.json",
+      "url": "https://publicreporting.cftc.gov/resource/gpe5-46if.json?%24select=report_date_as_yyyy_mm_dd%2Clev_money_positions_long%2Clev_money_positions_short%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27097741%27+AND+report_date_as_yyyy_mm_dd+between+%272010-01-01T00%3A00%3A00.000%27+and+%272026-09-15T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=20000"
+    },
+    "cftc_jun7-fc8e_2010-01-01_2026-09-15.json": {
+      "byte_count": 140624,
+      "cache_file": "cftc_jun7-fc8e_2010-01-01_2026-09-15.json",
+      "request_parameters": "%24select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27097741%27+AND+report_date_as_yyyy_mm_dd+between+%272010-01-01T00%3A00%3A00.000%27+and+%272026-09-15T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=20000",
+      "retrieved_at_utc": "2026-09-15T15:40:50.754114+00:00",
+      "sha256": "2f7b9c831a0154292ffb5f358fca0235e78d8c91a558ffb9da0a2908754312e4",
+      "source_name": "cftc_jun7-fc8e_2010-01-01_2026-09-15.json",
+      "url": "https://publicreporting.cftc.gov/resource/jun7-fc8e.json?%24select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27097741%27+AND+report_date_as_yyyy_mm_dd+between+%272010-01-01T00%3A00%3A00.000%27+and+%272026-09-15T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=20000"
+    },
+    "cftc_yw9f-hn96_2010-01-01_2026-09-15.json": {
+      "byte_count": 136900,
+      "cache_file": "cftc_yw9f-hn96_2010-01-01_2026-09-15.json",
+      "request_parameters": "%24select=report_date_as_yyyy_mm_dd%2Clev_money_positions_long%2Clev_money_positions_short%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27097741%27+AND+report_date_as_yyyy_mm_dd+between+%272010-01-01T00%3A00%3A00.000%27+and+%272026-09-15T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=20000",
+      "retrieved_at_utc": "2026-09-15T15:40:53.397457+00:00",
+      "sha256": "474dc6d730bcff8bb2c54f8793fa6a33ed0b1cda3ac368ee4e5772e8f5732acd",
+      "source_name": "cftc_yw9f-hn96_2010-01-01_2026-09-15.json",
+      "url": "https://publicreporting.cftc.gov/resource/yw9f-hn96.json?%24select=report_date_as_yyyy_mm_dd%2Clev_money_positions_long%2Clev_money_positions_short%2Copen_interest_all&%24where=cftc_contract_market_code%3D%27097741%27+AND+report_date_as_yyyy_mm_dd+between+%272010-01-01T00%3A00%3A00.000%27+and+%272026-09-15T23%3A59%3A59.999%27&%24order=report_date_as_yyyy_mm_dd&%24limit=20000"
+    }
+  },
+  "schema_version": 1
+}

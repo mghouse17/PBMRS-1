@@ -3,3 +3,5 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 Public Repo/notebooks/data_cache/yahoo_*.json
+Public Repo/notebooks/fx_cache/raw/cftc_catalog.json
+Public Repo/notebooks/fx_cache/raw/cftc_metadata_*.json
