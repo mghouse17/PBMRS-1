@@ -1,0 +1,63 @@
+{
+  "registered_at_utc": "2026-09-15T17:25:05.665252+00:00",
+  "design_sha256": "70f651031e9d5891791977568a56cb630c7c4a4dd615b2ed29ad3503e79c92e7",
+  "design": {
+    "schema_version": 1,
+    "design_status": "frozen after the registered event study returned insufficient_events and before any continuous-test estimate was computed",
+    "motivation": "The registered event-study estimand was sample-starved by construction. This is a new estimand, chosen because the old test did not execute, not because its results were unfavourable.",
+    "sample": {
+      "start": "2003-01-01",
+      "end": "2026-09-15",
+      "pairs": [
+        "JPY",
+        "EUR"
+      ],
+      "quote_convention": "USD per foreign-currency unit; positive returns are foreign-currency appreciation"
+    },
+    "estimator": {
+      "window": 500,
+      "step": 21,
+      "nlags": 8,
+      "point": "minimum-distance J on the eligible discrete grid",
+      "banks": "pair-specific banks and frozen nuisance scales from the registered FX event study"
+    },
+    "forward_horizon": 21,
+    "primary": {
+      "pair": "JPY",
+      "outcome": "forward_realized_volatility",
+      "estimand": "b in forward_stress = a + b * J_hat + c * log(current_realized_volatility) + error"
+    },
+    "secondary_outcomes": [
+      "forward_max_drawdown",
+      "forward_absolute_terminal_return"
+    ],
+    "falsification_pair": "EUR",
+    "negative_control": {
+      "kind": "independent Gaussian returns",
+      "matched_to": "JPY full-sample daily return SD",
+      "pipeline": "identical dates, rolling estimator, forward outcomes, regression and block bootstrap",
+      "series_seed": 781000
+    },
+    "regression": {
+      "intercept": true,
+      "predictor": "J_hat",
+      "control": "log(current_realized_volatility)",
+      "interval": 0.95
+    },
+    "bootstrap": {
+      "method": "circular moving-block pairs bootstrap",
+      "block_length_steps": 24,
+      "n_resamples": 4999,
+      "seeds": {
+        "JPY": 782001,
+        "EUR": 782002,
+        "Gaussian": 782003
+      }
+    },
+    "presentation": {
+      "secondary_table": "J_hat quintiles within current-volatility terciles",
+      "effective_window_spans_approx": 12,
+      "interpretation": "Intervals are expected to be wide because overlapping 500-session predictors are persistent despite non-overlapping forward outcomes. If b is near zero, report that the statistic adds nothing beyond volatility clustering."
+    }
+  }
+}
